@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -32,7 +34,6 @@ const RoleDetailsPage = () => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  /* ✅ ONLY FIXED PART */
   const handleSubmit = () => {
     setLoading(true);
     console.log(form);
@@ -47,66 +48,68 @@ const RoleDetailsPage = () => {
         return;
       }
 
-      // 🔥 FIX: normalize roles properly
       let path = "";
 
       if (role === "Patient") path = "/patient/dashboard";
       else if (role === "Doctor") path = "/doctor/dashboard";
       else if (role === "Staff") path = "/staff/dashboard";
-      else if (role === "Caregiver") path = "/relative/dashboard"; // IMPORTANT
+      else if (role === "Caregiver") path = "/relative/dashboard";
       else path = "/auth/login";
 
       navigate(path);
-
     }, 1000);
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#0C1B2A] via-[#0E1F31] to-[#16263A] text-white flex items-center justify-center px-6 lg:px-20">
+    <div className="min-h-screen w-full bg-gradient-to-br from-[#0C1B2A] via-[#0E1F31] to-[#16263A] text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 overflow-x-hidden">
 
       {/* MAIN CONTAINER */}
       <div className="w-full max-w-[1400px]">
 
         {/* HEADER */}
-        <div className="mb-10">
+        <div className="mb-8 sm:mb-10 text-center lg:text-left">
           <button
             onClick={() => navigate(-1)}
-            className="text-gray-400 hover:text-white mb-4"
+            className="text-sm text-gray-400 hover:text-white mb-4"
           >
             ← Back
           </button>
 
-          <p className="text-xs tracking-widest text-gray-500">
+          <p className="text-[10px] sm:text-xs tracking-widest text-gray-500">
             PROFILE DETAILS
           </p>
 
-          <h1 className="text-3xl lg:text-4xl font-bold mt-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-2">
             Complete your{" "}
             <span className="text-orange-400">{role}</span> Profile
           </h1>
         </div>
 
         {/* GRID */}
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 items-center">
 
           {/* LEFT */}
           <motion.div
             initial={{ opacity: 0, x: -60 }}
             animate={{ opacity: 1, x: 0 }}
-            className="relative"
+            className="relative text-center lg:text-left"
           >
-            <div className="absolute -top-20 left-0 w-[300px] h-[300px] bg-orange-400/10 blur-[120px] rounded-full" />
+            <div className="absolute -top-16 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 
+              w-[250px] sm:w-[300px] 
+              h-[250px] sm:h-[300px] 
+              bg-orange-400/10 blur-[100px] sm:blur-[120px] rounded-full"
+            />
 
-            <div className="relative z-10 max-w-md">
-              <h2 className="text-2xl font-semibold mb-4">
+            <div className="relative z-10 max-w-md mx-auto lg:mx-0">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
                 Almost there 🚀
               </h2>
 
-              <p className="text-gray-400">
+              <p className="text-sm sm:text-base text-gray-400">
                 Complete your profile to unlock full access to MediConnect features tailored for your role.
               </p>
 
-              <div className="mt-8 space-y-3 text-gray-300">
+              <div className="mt-6 sm:mt-8 space-y-2 sm:space-y-3 text-sm sm:text-base text-gray-300">
                 <p>✔ Personalized dashboard</p>
                 <p>✔ Secure data handling</p>
                 <p>✔ Role-based features</p>
@@ -119,16 +122,16 @@ const RoleDetailsPage = () => {
             initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl">
 
-              <div className="space-y-5">
+              <div className="space-y-4 sm:space-y-5">
                 {renderFields(role, handleChange)}
               </div>
 
               {/* BUTTON */}
               <button
                 onClick={handleSubmit}
-                className="mt-8 w-full py-3 rounded-xl font-semibold bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black hover:scale-[1.02] transition flex justify-center"
+                className="mt-6 sm:mt-8 w-full py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black hover:scale-[1.02] transition flex justify-center"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -205,7 +208,7 @@ function Input({ label, onChange }: InputProps) {
     <input
       placeholder={label}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 outline-none"
+      className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-white/5 border border-white/10 text-sm sm:text-base focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 outline-none"
     />
   );
 }
@@ -216,7 +219,7 @@ function Select({ label, options, onChange }: SelectProps) {
   return (
     <select
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-xl bg-[#16263A] border border-white/10 text-white focus:border-orange-400 outline-none"
+      className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#16263A] border border-white/10 text-sm sm:text-base text-white focus:border-orange-400 outline-none"
       defaultValue=""
     >
       <option value="" disabled>{label}</option>

@@ -23,25 +23,25 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="relative py-32">
+    <section className="relative py-20 sm:py-28 md:py-32">
 
-      <div className="max-w-7xl mx-auto px-6 md:px-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10">
 
         {/* 🔥 HEADER */}
         <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-semibold text-white leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-semibold text-white leading-tight">
             Everything You Need for{" "}
             <span className="text-orange-400">Better Healthcare</span>
           </h2>
 
-          <p className="mt-5 text-gray-400 text-lg leading-relaxed">
+          <p className="mt-4 sm:mt-5 text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed px-2 sm:px-0">
             MediConnect brings together appointments, medication tracking,
             emergency support, and digital records — all in one unified platform.
           </p>
         </div>
 
         {/* 🔥 FEATURE CARDS */}
-        <div className="mt-20 grid md:grid-cols-3 gap-8">
+        <div className="mt-12 sm:mt-16 md:mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
 
           {features.map((f, i) => {
             const Icon = f.icon
@@ -55,7 +55,7 @@ const FeaturesSection = () => {
                 viewport={{ once: true }}
                 className="
                   group relative
-                  p-8 rounded-2xl
+                  p-5 sm:p-6 md:p-8 rounded-2xl
                   bg-white/[0.04] backdrop-blur-xl
                   border border-white/10
                   hover:border-orange-400/40
@@ -66,29 +66,30 @@ const FeaturesSection = () => {
 
                 {/* 🔶 ICON */}
                 <div className="
-                  w-14 h-14 flex items-center justify-center
+                  w-12 h-12 sm:w-14 sm:h-14 
+                  flex items-center justify-center
                   rounded-xl
                   bg-orange-400/10 text-orange-400
-                  mb-6
+                  mb-4 sm:mb-6
                   transition-all duration-300
                   group-hover:scale-110 group-hover:bg-orange-400/20
                 ">
-                  <Icon size={26} />
+                  <Icon size={22} className="sm:w-[26px] sm:h-[26px]" />
                 </div>
 
                 {/* TITLE */}
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-lg sm:text-xl font-semibold text-white">
                   {f.title}
                 </h3>
 
                 {/* DESC */}
-                <p className="mt-3 text-gray-400 leading-relaxed">
+                <p className="mt-2 sm:mt-3 text-sm sm:text-base text-gray-400 leading-relaxed">
                   {f.desc}
                 </p>
 
                 {/* 🔥 HOVER ACCENT LINE */}
                 <div className="
-                  mt-6 h-[2px] w-0
+                  mt-5 sm:mt-6 h-[2px] w-0
                   bg-orange-400
                   transition-all duration-300
                   group-hover:w-16

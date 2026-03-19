@@ -1,4 +1,4 @@
-
+"use client"
 
 import { useState } from "react"
 import { motion } from "framer-motion"
@@ -22,34 +22,44 @@ const RoleSelectionPage = () => {
     <AuthLayout>
 
       {/* 🔥 WRAPPER */}
-      <div className="relative w-full max-w-5xl mx-auto">
+      <div className="relative w-full max-w-3xl sm:max-w-4xl mx-auto px-4">
 
-        {/* 🌌 BACKGROUND GLOWS (SUBTLE DEPTH ONLY) */}
-        <div className="absolute -top-32 left-[-200px] w-[500px] h-[500px] bg-blue-500/10 blur-[180px] rounded-full" />
-        <div className="absolute top-20 right-[-200px] w-[500px] h-[500px] bg-orange-400/10 blur-[180px] rounded-full" />
+        {/* 🌌 BACKGROUND GLOWS */}
+        <div className="absolute -top-32 left-[-150px] w-[400px] h-[400px] bg-blue-500/10 blur-[150px] rounded-full" />
+        <div className="absolute top-20 right-[-150px] w-[400px] h-[400px] bg-orange-400/10 blur-[150px] rounded-full" />
 
         {/* ✨ HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-16 text-center"
+          className="mb-12 sm:mb-16 text-center"
         >
           <p className="text-xs tracking-[0.3em] text-gray-500">
             SELECT ROLE
           </p>
 
-          <h2 className="text-4xl md:text-5xl font-semibold mt-4 text-white leading-tight">
+          <h2 className="
+            mt-4
+            text-3xl sm:text-4xl md:text-5xl
+            font-semibold text-white leading-tight
+            break-words
+          ">
             How will you use <br />
-            <span className="text-orange-400">MediConnect?</span>
+            <span className="text-orange-400 break-words">
+              MediConnect?
+            </span>
           </h2>
 
-          <p className="text-gray-400 mt-5 max-w-xl mx-auto text-base">
+          <p className="text-gray-400 mt-5 max-w-md sm:max-w-lg mx-auto text-sm sm:text-base">
             Choose your role to personalize your experience and unlock features tailored just for you.
           </p>
         </motion.div>
 
         {/* 💥 ROLE GRID */}
-        <div className="grid grid-cols-2 gap-10 max-w-3xl mx-auto">
+        <div className="
+          grid grid-cols-2 gap-6 sm:gap-8
+          max-w-sm sm:max-w-xl mx-auto
+        ">
           {roles.map((role, i) => (
             <motion.div
               key={role}
@@ -71,14 +81,15 @@ const RoleSelectionPage = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-20 flex flex-col items-center"
+          className="mt-12 sm:mt-16 flex flex-col items-center"
         >
           <button
             onClick={handleContinue}
             disabled={!selectedRole}
             className={`
               relative overflow-hidden
-              w-72 py-4 rounded-full font-semibold tracking-wide text-sm
+              w-full max-w-xs py-3 sm:py-4
+              rounded-full font-semibold tracking-wide text-sm
               transition-all duration-300
 
               ${
@@ -97,8 +108,7 @@ const RoleSelectionPage = () => {
             </span>
           </button>
 
-          {/* 🧠 TRUST LINE */}
-          <p className="mt-6 text-sm text-gray-500">
+          <p className="mt-5 text-xs sm:text-sm text-gray-500 text-center">
             Trusted by 250+ healthcare professionals
           </p>
         </motion.div>

@@ -7,7 +7,7 @@ const Navbar = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="fixed top-6 left-0 right-0 z-50 px-6 md:px-10">
+    <div className="fixed top-4 md:top-6 left-0 right-0 z-50 px-4 sm:px-6 md:px-10">
 
       <motion.div
         initial={{ y: -40, opacity: 0 }}
@@ -20,7 +20,7 @@ const Navbar = () => {
         <h1
           onClick={() => navigate("/")}
           className="
-            text-xl md:text-2xl font-semibold tracking-wide
+            text-lg sm:text-xl md:text-2xl font-semibold tracking-wide
             text-white cursor-pointer
             transition-all duration-300
             hover:text-orange-300
@@ -29,13 +29,14 @@ const Navbar = () => {
           Medi<span className="text-orange-400">Connect</span>
         </h1>
 
-        {/* 🚀 SINGLE CTA */}
+        {/* 🚀 CTA */}
         <button
           onClick={() => navigate("/auth/role")}
           className="
-            px-7 md:px-8 py-2.5 md:py-3
+            px-5 sm:px-6 md:px-8
+            py-2 sm:py-2.5 md:py-3
             rounded-xl
-            text-sm md:text-base font-medium
+            text-xs sm:text-sm md:text-base font-medium
 
             text-black
             bg-gradient-to-r from-[#FF9F1C] to-[#FFB703]
