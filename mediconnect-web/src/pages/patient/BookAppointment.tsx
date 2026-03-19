@@ -40,121 +40,126 @@ const BookAppointment = () => {
 
   const handleSubmit = () => {
     if (!isValid) return;
-
     alert("Appointment Confirmed ✅");
   };
 
   return (
     <DashboardLayout>
 
-      {/* HEADER */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-semibold">Book Appointment</h1>
-        <p className="text-gray-400 mt-2 text-sm">
-          Schedule your consultation easily
-        </p>
-      </div>
+      <div className="w-full max-w-3xl mx-auto">
 
-      <div className="max-w-3xl space-y-10">
+        {/* HEADER */}
+        <div className="mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl font-semibold">
+            Book Appointment
+          </h1>
+          <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm">
+            Schedule your consultation easily
+          </p>
+        </div>
 
-        {/* DEPARTMENT */}
-        <Section title="Department">
-          <div className="flex flex-wrap gap-3">
-            {departments.map((dept) => {
-              const selected = selectedDepartment === dept;
+        <div className="space-y-6 sm:space-y-10">
 
-              return (
-                <button
-                  key={dept}
-                  onClick={() => setSelectedDepartment(dept)}
-                  className={`px-5 py-2 rounded-xl border transition 
-                  ${
-                    selected
-                      ? "border-teal-400 text-teal-400 bg-white/5"
-                      : "border-white/10 text-gray-400 hover:bg-white/5"
-                  }`}
-                >
-                  {dept}
-                </button>
-              );
-            })}
-          </div>
-        </Section>
+          {/* DEPARTMENT */}
+          <Section title="Department">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {departments.map((dept) => {
+                const selected = selectedDepartment === dept;
 
-        {/* DOCTOR */}
-        <Section title="Doctor">
-          <input
-            value={doctor}
-            onChange={(e) => setDoctor(e.target.value)}
-            placeholder="Enter doctor's name"
-            className="w-full px-4 py-3 rounded-xl bg-[#14283C] border border-white/10 text-white outline-none focus:border-teal-400"
-          />
-        </Section>
+                return (
+                  <button
+                    key={dept}
+                    onClick={() => setSelectedDepartment(dept)}
+                    className={`px-3 sm:px-5 py-2 rounded-xl border transition text-xs sm:text-sm
+                    ${
+                      selected
+                        ? "border-teal-400 text-teal-400 bg-white/5"
+                        : "border-white/10 text-gray-400 hover:bg-white/5"
+                    }`}
+                  >
+                    {dept}
+                  </button>
+                );
+              })}
+            </div>
+          </Section>
 
-        {/* DATE */}
-        <Section title="Date">
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {next7Days.map((date, i) => {
-              const selected =
-                selectedDate?.toDateString() === date.toDateString();
+          {/* DOCTOR */}
+          <Section title="Doctor">
+            <input
+              value={doctor}
+              onChange={(e) => setDoctor(e.target.value)}
+              placeholder="Enter doctor's name"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-[#14283C] border border-white/10 text-white outline-none focus:border-teal-400 text-sm"
+            />
+          </Section>
 
-              return (
-                <button
-                  key={i}
-                  onClick={() => setSelectedDate(date)}
-                  className={`min-w-[70px] py-3 rounded-xl border transition flex flex-col items-center
-                  ${
-                    selected
-                      ? "border-teal-400 text-teal-400"
-                      : "border-white/10 text-gray-400"
-                  }`}
-                >
-                  <span className="font-semibold">{date.getDate()}</span>
-                  <span className="text-xs">
-                    {month(date.getMonth())}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </Section>
+          {/* DATE */}
+          <Section title="Date">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {next7Days.map((date, i) => {
+                const selected =
+                  selectedDate?.toDateString() === date.toDateString();
 
-        {/* TIME */}
-        <Section title="Time Slot">
-          <div className="flex flex-wrap gap-3">
-            {timeSlots.map((slot) => {
-              const selected = selectedSlot === slot;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedDate(date)}
+                    className={`min-w-[60px] sm:min-w-[70px] py-2 sm:py-3 rounded-xl border transition flex flex-col items-center text-xs sm:text-sm
+                    ${
+                      selected
+                        ? "border-teal-400 text-teal-400"
+                        : "border-white/10 text-gray-400"
+                    }`}
+                  >
+                    <span className="font-semibold">{date.getDate()}</span>
+                    <span className="text-[10px] sm:text-xs">
+                      {month(date.getMonth())}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </Section>
 
-              return (
-                <button
-                  key={slot}
-                  onClick={() => setSelectedSlot(slot)}
-                  className={`px-4 py-2 rounded-lg border transition
-                  ${
-                    selected
-                      ? "border-teal-400 text-teal-400"
-                      : "border-white/10 text-gray-400"
-                  }`}
-                >
-                  {slot}
-                </button>
-              );
-            })}
-          </div>
-        </Section>
+          {/* TIME */}
+          <Section title="Time Slot">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {timeSlots.map((slot) => {
+                const selected = selectedSlot === slot;
 
-        {/* SUBMIT */}
-        <button
-          onClick={handleSubmit}
-          className={`w-full py-4 rounded-xl font-semibold transition
-          ${
-            isValid
-              ? "bg-teal-400 text-black hover:scale-[1.01]"
-              : "bg-teal-400/30 text-black/50 cursor-not-allowed"
-          }`}
-        >
-          Confirm Appointment
-        </button>
+                return (
+                  <button
+                    key={slot}
+                    onClick={() => setSelectedSlot(slot)}
+                    className={`px-3 sm:px-4 py-2 rounded-lg border transition text-xs sm:text-sm
+                    ${
+                      selected
+                        ? "border-teal-400 text-teal-400"
+                        : "border-white/10 text-gray-400"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                );
+              })}
+            </div>
+          </Section>
+
+          {/* SUBMIT */}
+          <button
+            onClick={handleSubmit}
+            className={`w-full py-3 sm:py-4 rounded-xl font-semibold text-sm sm:text-base transition
+            ${
+              isValid
+                ? "bg-teal-400 text-black hover:scale-[1.01]"
+                : "bg-teal-400/30 text-black/50 cursor-not-allowed"
+            }`}
+          >
+            Confirm Appointment
+          </button>
+
+        </div>
 
       </div>
 
@@ -175,7 +180,7 @@ const Section = ({
 }) => {
   return (
     <div>
-      <p className="text-xs tracking-widest text-gray-500 mb-3">
+      <p className="text-[10px] sm:text-xs tracking-widest text-gray-500 mb-2 sm:mb-3">
         {title.toUpperCase()}
       </p>
       {children}

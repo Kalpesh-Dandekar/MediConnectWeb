@@ -12,52 +12,52 @@ const StaffProfile = () => {
   };
 
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-8">
 
-      {/* ===== HEADER ===== */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Profile</h1>
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold">Profile</h1>
 
-        <div className="hidden md:flex items-center gap-2 text-xs text-white/50">
+        <div className="hidden sm:flex items-center gap-2 text-xs text-white/50">
           <Shield size={14} />
           Secure Account
         </div>
       </div>
 
-      {/* ===== MAIN GRID ===== */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* MAIN GRID */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
 
-        {/* ===== LEFT PROFILE CARD ===== */}
-        <div className="bg-[#14283C] rounded-2xl p-8 flex flex-col items-center text-center shadow-md">
+        {/* LEFT PROFILE */}
+        <div className="bg-[#14283C] rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center shadow-md">
 
           {/* AVATAR */}
-          <div className="h-24 w-24 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-2xl font-bold">
+          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl sm:text-2xl font-bold">
             ST
           </div>
 
           {/* INFO */}
-          <h2 className="mt-5 text-xl font-semibold">
+          <h2 className="mt-4 sm:mt-5 text-lg sm:text-xl font-semibold">
             Anjali Deshmukh
           </h2>
 
-          <span className="mt-2 px-3 py-1 text-xs rounded-full bg-blue-500/20 text-blue-400">
+          <span className="mt-2 px-3 py-1 text-[10px] sm:text-xs rounded-full bg-blue-500/20 text-blue-400">
             Staff Member
           </span>
 
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-xs sm:text-sm text-white/60">
             Employee ID: ST-2045
           </p>
 
         </div>
 
-        {/* ===== RIGHT CONTENT ===== */}
-        <div className="xl:col-span-2 space-y-6">
+        {/* RIGHT CONTENT */}
+        <div className="xl:col-span-2 space-y-5 sm:space-y-6">
 
           {/* WORK INFO */}
           <div>
             <SectionTitle title="Work Information" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
 
               <InfoCard
                 label="Department"
@@ -90,7 +90,7 @@ const StaffProfile = () => {
           <div>
             <SectionTitle title="Account" />
 
-            <div className="space-y-3 mt-4">
+            <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
 
               <ActionCard label="Change Password" />
 
@@ -116,7 +116,7 @@ export default StaffProfile;
 /* ===== SECTION TITLE ===== */
 
 const SectionTitle = ({ title }: { title: string }) => (
-  <p className="text-xs tracking-widest text-white/50 uppercase">
+  <p className="text-[10px] sm:text-xs tracking-widest text-white/50 uppercase">
     {title}
   </p>
 );
@@ -133,14 +133,18 @@ const InfoCard = ({
   icon: any;
 }) => {
   return (
-    <div className="bg-[#14283C] p-5 rounded-xl flex items-center gap-4 hover:bg-[#1b3550] transition">
-      <div className="p-3 bg-white/5 rounded-lg">
-        <Icon size={18} className="text-blue-400" />
+    <div className="bg-[#14283C] p-4 sm:p-5 rounded-xl flex items-center gap-3 sm:gap-4 hover:bg-[#1b3550] transition">
+      <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
+        <Icon size={16} className="text-blue-400" />
       </div>
 
-      <div>
-        <p className="text-xs text-white/50">{label}</p>
-        <p className="text-sm font-medium mt-1">{value}</p>
+      <div className="min-w-0">
+        <p className="text-[10px] sm:text-xs text-white/50">
+          {label}
+        </p>
+        <p className="text-xs sm:text-sm font-medium mt-1 truncate">
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -160,13 +164,13 @@ const ActionCard = ({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl bg-[#14283C] transition ${
+      className={`w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[#14283C] transition ${
         danger
           ? "text-red-400 hover:bg-red-500/10"
           : "text-white/80 hover:bg-white/5"
       }`}
     >
-      <span className="text-sm font-medium">{label}</span>
+      <span className="text-xs sm:text-sm font-medium">{label}</span>
       <span className="text-white/30">→</span>
     </button>
   );

@@ -49,41 +49,68 @@ const StaffPatients = () => {
   );
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full max-w-screen-xl mx-auto space-y-6">
 
-      {/* ===== HEADER ===== */}
-      <div className="flex justify-between items-center">
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold">Patient Records</h1>
-          <p className="text-white/60 text-sm mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            Patient Records
+          </h1>
+          <p className="text-white/60 text-xs sm:text-sm mt-1">
             {patients.length} registered patients
           </p>
         </div>
 
-        <button className="bg-blue-500 px-5 py-2 rounded-lg hover:bg-blue-600 transition text-sm font-medium flex items-center gap-2">
-          <Users size={16} />
+        <button className="bg-blue-500 px-4 sm:px-5 py-2 rounded-lg hover:bg-blue-600 transition text-xs sm:text-sm font-medium flex items-center gap-2 w-fit">
+          <Users size={14} />
           Add Patient
         </button>
       </div>
 
-      {/* ===== SEARCH ===== */}
-      <div className="w-full max-w-xl bg-white/5 rounded-xl px-4 py-3 flex items-center gap-3 border border-white/5 focus-within:border-blue-500/50 transition">
-        <Search size={16} className="text-white/50" />
+      {/* SEARCH */}
+      <div className="w-full sm:max-w-xl bg-white/5 rounded-xl px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-3 border border-white/5 focus-within:border-blue-500/50 transition">
+        <Search size={14} className="text-white/50" />
         <input
           type="text"
           placeholder="Search by name or ID"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent outline-none text-white w-full text-sm placeholder:text-white/40"
+          className="bg-transparent outline-none text-white w-full text-xs sm:text-sm placeholder:text-white/40"
         />
       </div>
 
-      {/* ===== TABLE ===== */}
-      <div className="bg-[#14283C] rounded-xl overflow-hidden border border-white/5">
+      {/* MOBILE CARDS */}
+      <div className="space-y-3 sm:hidden">
+        {filteredPatients.map((p, i) => (
+          <div key={i} className="bg-[#14283C] p-4 rounded-xl border border-white/5">
+
+            <div className="flex justify-between items-center mb-2">
+              <p className="font-semibold text-sm">{p.name}</p>
+              <StatusBadge status={p.status} />
+            </div>
+
+            <p className="text-xs text-white/60">ID: {p.id}</p>
+            <p className="text-xs text-white/60">Age: {p.age}</p>
+            <p className="text-xs text-white/60">{p.phone}</p>
+            <p className="text-xs text-white/50">{p.dept}</p>
+
+            <div className="flex justify-between mt-3">
+              <button className="text-xs text-white/60">Edit</button>
+              <button className="px-3 py-1 text-xs bg-blue-500 rounded-lg">
+                Manage
+              </button>
+            </div>
+
+          </div>
+        ))}
+      </div>
+
+      {/* DESKTOP TABLE */}
+      <div className="hidden sm:block bg-[#14283C] rounded-xl overflow-hidden border border-white/5">
 
         <table className="w-full text-left">
 
-          {/* HEADER */}
           <thead className="bg-white/5 text-white/60 text-sm">
             <tr>
               <th className="p-4">Patient</th>
@@ -95,14 +122,10 @@ const StaffPatients = () => {
             </tr>
           </thead>
 
-          {/* BODY */}
           <tbody>
             {filteredPatients.map((p, i) => (
-              <tr
-                key={i}
-                className="border-t border-white/5 hover:bg-white/5 transition"
-              >
-                {/* PATIENT */}
+              <tr key={i} className="border-t border-white/5 hover:bg-white/5">
+
                 <td className="p-4">
                   <div className="font-medium">{p.name}</div>
                   <div className="text-xs text-white/50">
@@ -110,30 +133,21 @@ const StaffPatients = () => {
                   </div>
                 </td>
 
-                {/* ID */}
-                <td className="text-white/70">{p.id}</td>
+                <td>{p.id}</td>
+                <td>{p.phone}</td>
+                <td>{p.dept}</td>
+                <td><StatusBadge status={p.status} /></td>
 
-                {/* PHONE */}
-                <td className="text-white/70">{p.phone}</td>
-
-                {/* DEPT */}
-                <td className="text-white/60">{p.dept}</td>
-
-                {/* STATUS */}
-                <td>
-                  <StatusBadge status={p.status} />
-                </td>
-
-                {/* ACTIONS */}
                 <td className="text-right pr-6 space-x-2">
-                  <button className="px-3 py-1 text-sm text-white/60 hover:text-white transition">
+                  <button className="text-white/60 hover:text-white text-sm">
                     Edit
                   </button>
 
-                  <button className="px-4 py-1.5 bg-blue-500 rounded-lg text-sm hover:bg-blue-600 transition">
+                  <button className="px-4 py-1.5 bg-blue-500 rounded-lg text-sm">
                     Manage
                   </button>
                 </td>
+
               </tr>
             ))}
           </tbody>
@@ -160,7 +174,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     style = "bg-gray-500/20 text-gray-400";
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${style}`}>
+    <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs ${style}`}>
       {status}
     </span>
   );

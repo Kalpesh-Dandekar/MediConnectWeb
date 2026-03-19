@@ -63,25 +63,25 @@ const TodayAppointments = () => {
   };
 
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-8">
 
       {/* HEADER */}
       <div>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-2xl sm:text-3xl font-bold">
           Today's Appointments
         </h1>
-        <p className="text-white/60 text-sm mt-1">
+        <p className="text-white/60 text-xs sm:text-sm mt-1">
           {filtered.length} {selectedFilter} patients
         </p>
       </div>
 
       {/* FILTERS */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2 sm:gap-3">
         {["Waiting", "In Consultation", "Completed"].map((f) => (
           <button
             key={f}
             onClick={() => setSelectedFilter(f as any)}
-            className={`px-4 py-2 rounded-xl text-sm transition ${
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm transition ${
               selectedFilter === f
                 ? "bg-white/10 text-white"
                 : "text-white/60 hover:bg-white/5"
@@ -93,10 +93,10 @@ const TodayAppointments = () => {
       </div>
 
       {/* LIST */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
 
         {filtered.length === 0 ? (
-          <div className="p-6 rounded-xl bg-[#14283C] text-white/60">
+          <div className="p-4 sm:p-6 rounded-xl bg-[#14283C] text-white/60 text-sm">
             No patients in {selectedFilter}
           </div>
         ) : (
@@ -106,30 +106,28 @@ const TodayAppointments = () => {
             return (
               <div
                 key={i}
-                className="flex items-center justify-between p-5 rounded-2xl 
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 sm:p-5 rounded-2xl 
                            bg-[#14283C] border border-white/5 
                            hover:scale-[1.01] hover:shadow-lg transition-all duration-300"
               >
 
                 {/* LEFT */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
 
-                  {/* TOKEN */}
                   <div
-                    className={`w-11 h-11 flex items-center justify-center rounded-full font-bold text-black ${style.dot}`}
+                    className={`w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center rounded-full font-bold text-black text-xs sm:text-sm ${style.dot}`}
                   >
                     {item.token}
                   </div>
 
-                  {/* INFO */}
-                  <div>
-                    <p className="font-semibold">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm sm:text-base truncate">
                       {item.name} ({item.age})
                     </p>
-                    <p className="text-sm text-white/60">
+                    <p className="text-xs sm:text-sm text-white/60 truncate">
                       {item.reason}
                     </p>
-                    <p className="text-xs text-white/40">
+                    <p className="text-[10px] sm:text-xs text-white/40">
                       {item.time}
                     </p>
                   </div>
@@ -137,16 +135,14 @@ const TodayAppointments = () => {
                 </div>
 
                 {/* RIGHT */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
 
-                  {/* STATUS BADGE */}
-                  <span className={`px-3 py-1 text-xs rounded-full ${style.badge}`}>
+                  <span className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded-full ${style.badge}`}>
                     {item.status}
                   </span>
 
-                  {/* ACTION */}
                   <button
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${style.btn}`}
+                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition ${style.btn}`}
                   >
                     {item.status === "Completed"
                       ? "View"
@@ -164,7 +160,7 @@ const TodayAppointments = () => {
       </div>
 
       {/* SUMMARY */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
 
         <Summary
           label="Waiting"
@@ -204,9 +200,9 @@ const Summary = ({
   color: string;
 }) => {
   return (
-    <div className="p-6 rounded-2xl bg-gradient-to-br from-[#14283C] to-[#1a3654] border border-white/5 text-center hover:scale-[1.02] transition">
-      <p className={`text-3xl font-bold ${color}`}>{count}</p>
-      <p className="text-xs text-white/60 mt-1">{label}</p>
+    <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-[#14283C] to-[#1a3654] border border-white/5 text-center hover:scale-[1.02] transition">
+      <p className={`text-2xl sm:text-3xl font-bold ${color}`}>{count}</p>
+      <p className="text-[10px] sm:text-xs text-white/60 mt-1">{label}</p>
     </div>
   );
 };

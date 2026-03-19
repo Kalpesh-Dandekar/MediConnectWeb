@@ -23,6 +23,7 @@ import Patients from "./pages/doctor/Patients";
 import Consultation from "./pages/doctor/Consultation";
 import Profile from "./pages/doctor/DoctorProfile";
 import DoctorAppointments from "./pages/doctor/TodayAppointments";
+import ViewReports from "./pages/doctor/ViewReports";
 
 /* ================= STAFF ================= */
 import StaffLayout from "./layout/StaffLayout";
@@ -40,7 +41,6 @@ import RelativeReports from "./pages/relative/RelativeReports";
 import RelativeProfile from "./pages/relative/RelativeProfile";
 
 function App() {
-  /* ✅ FIX: normalize role */
   const role = (localStorage.getItem("role") || "patient").toLowerCase();
 
   return (
@@ -71,6 +71,9 @@ function App() {
         <Route path="patients" element={<Patients />} />
         <Route path="consultation" element={<Consultation />} />
         <Route path="profile" element={<Profile />} />
+
+        {/* ✅ FIXED ROUTE */}
+        <Route path="view-reports" element={<ViewReports />} />
       </Route>
 
       {/* ================= STAFF ================= */}

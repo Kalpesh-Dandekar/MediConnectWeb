@@ -9,7 +9,7 @@ import {
   User,
   Pill,
   LogOut,
-  AlertTriangle, // ✅ added
+  AlertTriangle,
 } from "lucide-react";
 
 type MenuItem = {
@@ -31,12 +31,11 @@ const Sidebar = () => {
 
   /* ================= MENUS ================= */
 
-  // ✅ FULLY MATCHES FLUTTER PATIENT NAV
   const patientMenu: MenuItem[] = [
     { label: "Home", icon: LayoutDashboard, path: "/patient/dashboard" },
     { label: "Appointments", icon: CalendarDays, path: "/patient/appointments" },
-    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency" }, // ✅ added
-    { label: "Medicines", icon: Pill, path: "/patient/medicines" }, // ✅ added
+    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency" },
+    { label: "Medicines", icon: Pill, path: "/patient/medicines" },
     { label: "Reports", icon: FileText, path: "/patient/reports" },
   ];
 
@@ -92,16 +91,12 @@ const Sidebar = () => {
   /* ================= UI ================= */
 
   return (
-    <aside className="w-64 bg-[#0E1F31] border-r border-white/10 flex flex-col p-6">
+    <aside className="hidden lg:flex w-64 bg-[#0E1F31] border-r border-white/10 flex-col p-6">
 
       {/* ===== LOGO ===== */}
       <div className="flex items-center gap-3 mb-10">
-
-        {/* M LOGO */}
         <div className="w-11 h-11 rounded-full bg-orange-500/20 flex items-center justify-center shadow-inner">
-          <span className="font-bold text-lg text-orange-400">
-            M
-          </span>
+          <span className="font-bold text-lg text-orange-400">M</span>
         </div>
 
         <span className="text-lg font-semibold tracking-wide">
@@ -111,7 +106,6 @@ const Sidebar = () => {
 
       {/* ===== MENU ===== */}
       <nav className="flex-1 space-y-2">
-
         {menu.map((item, index) => {
           const isActive = location.pathname.startsWith(item.path);
           const Icon = item.icon;
@@ -140,7 +134,6 @@ const Sidebar = () => {
             </button>
           );
         })}
-
       </nav>
 
       {/* ===== LOGOUT ===== */}

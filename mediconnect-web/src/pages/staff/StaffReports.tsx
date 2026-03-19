@@ -35,13 +35,15 @@ const StaffReports = () => {
   const uploaded = reports.filter((r) => r.status === "Uploaded");
 
   return (
-    <div className="w-full space-y-8">
+    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-8">
 
-      {/* ===== HEADER ===== */}
+      {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Report Management</h1>
-          <p className="text-white/60 text-sm mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            Report Management
+          </h1>
+          <p className="text-white/60 text-xs sm:text-sm mt-1">
             Manage lab report processing
           </p>
         </div>
@@ -52,8 +54,8 @@ const StaffReports = () => {
         </div>
       </div>
 
-      {/* ===== SUMMARY ===== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* SUMMARY */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <SummaryCard
           label="Pending"
           count={pending.length}
@@ -68,25 +70,25 @@ const StaffReports = () => {
         />
       </div>
 
-      {/* ===== MAIN GRID ===== */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      {/* MAIN GRID */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
 
-        {/* ===== PENDING ===== */}
+        {/* PENDING */}
         <div>
           <SectionTitle title="Pending Reports" />
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
             {pending.map((r, i) => (
               <ReportCard key={i} {...r} />
             ))}
           </div>
         </div>
 
-        {/* ===== UPLOADED ===== */}
+        {/* UPLOADED */}
         <div>
           <SectionTitle title="Uploaded Reports" />
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
             {uploaded.map((r, i) => (
               <ReportCard key={i} {...r} />
             ))}
@@ -104,7 +106,7 @@ export default StaffReports;
 /* ===== SECTION TITLE ===== */
 
 const SectionTitle = ({ title }: { title: string }) => (
-  <p className="text-xs tracking-widest text-white/50 uppercase">
+  <p className="text-[10px] sm:text-xs tracking-widest text-white/50 uppercase">
     {title}
   </p>
 );
@@ -123,21 +125,21 @@ const SummaryCard = ({
   color: "orange" | "green";
 }) => {
   const styles: any = {
-    orange: "text-orange-400 bg-orange-500/10",
-    green: "text-green-400 bg-green-500/10",
+    orange: "text-orange-400",
+    green: "text-green-400",
   };
 
   return (
-    <div className="p-6 bg-[#14283C] rounded-xl flex items-center justify-between">
+    <div className="p-4 sm:p-6 bg-[#14283C] rounded-xl flex items-center justify-between">
       <div>
-        <p className="text-sm text-white/70">{label}</p>
-        <h2 className={`text-3xl font-bold mt-1 ${styles[color].split(" ")[0]}`}>
+        <p className="text-xs sm:text-sm text-white/70">{label}</p>
+        <h2 className={`text-xl sm:text-3xl font-bold mt-1 ${styles[color]}`}>
           {count}
         </h2>
       </div>
 
-      <div className="p-3 bg-white/5 rounded-lg">
-        <Icon size={18} className={styles[color].split(" ")[0]} />
+      <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
+        <Icon size={16} className={styles[color]} />
       </div>
     </div>
   );
@@ -162,38 +164,40 @@ const ReportCard = ({
 
       {/* LEFT STRIP */}
       <div
-        className={`w-1.5 ${
+        className={`w-1 ${
           isPending ? "bg-orange-400" : "bg-green-400"
         }`}
       />
 
       {/* CONTENT */}
-      <div className="p-5 flex-1">
+      <div className="p-4 sm:p-5 flex-1">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center">
-          <h3 className="font-semibold">{patient}</h3>
+        <div className="flex justify-between items-center gap-2">
+          <h3 className="font-semibold text-sm sm:text-base truncate">
+            {patient}
+          </h3>
 
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${statusColor}`}
+            className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium ${statusColor}`}
           >
             {status}
           </span>
         </div>
 
         {/* DETAILS */}
-        <div className="mt-3 text-sm text-white/70">
+        <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-white/70">
           {reportType}
         </div>
 
-        <div className="text-xs text-white/50 mt-1">
+        <div className="text-[10px] sm:text-xs text-white/50 mt-1">
           Collected: {collectedDate}
         </div>
 
         {/* ACTION */}
-        <div className="flex justify-end mt-4">
+        <div className="flex justify-end mt-3 sm:mt-4">
           <button
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${
+            className={`px-3 sm:px-4 py-1 text-xs sm:text-sm rounded-lg font-medium transition ${
               isPending
                 ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
                 : "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"

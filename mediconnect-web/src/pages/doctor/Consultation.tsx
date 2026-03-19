@@ -60,10 +60,10 @@ const Consultation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0C1B2A] text-white p-6">
+    <div className="w-full max-w-screen-xl mx-auto">
 
       {/* HEADER */}
-      <h1 className="text-2xl font-bold mb-6">
+      <h1 className="text-xl sm:text-2xl font-bold mb-5 sm:mb-6">
         {patientName}
       </h1>
 
@@ -85,23 +85,23 @@ const Consultation = () => {
 
         <button
           onClick={addPrescription}
-          className="mt-3 px-4 py-2 bg-teal-400 text-black rounded-lg font-semibold"
+          className="mt-3 px-3 sm:px-4 py-2 text-sm sm:text-base bg-teal-400 text-black rounded-lg font-semibold"
         >
           Add Medicine
         </button>
 
         {/* LIST */}
-        <div className="mt-4 space-y-2">
+        <div className="mt-3 sm:mt-4 space-y-2">
           {prescriptions.map((p, i) => (
             <div
               key={i}
-              className="bg-white/5 p-3 rounded-lg"
+              className="bg-white/5 p-2 sm:p-3 rounded-lg"
             >
-              <p className="font-semibold">{p.medicine}</p>
-              <p className="text-sm text-gray-400">
+              <p className="font-semibold text-sm sm:text-base">{p.medicine}</p>
+              <p className="text-xs sm:text-sm text-gray-400">
                 Dosage: {p.dosage}
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-400">
                 Duration: {p.duration}
               </p>
             </div>
@@ -116,7 +116,7 @@ const Consultation = () => {
             <button
               key={t}
               onClick={() => toggleTest(t)}
-              className={`px-3 py-1 rounded-full text-sm ${
+              className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${
                 tests.includes(t)
                   ? "bg-teal-400/20 text-teal-300"
                   : "bg-white/5 text-gray-400"
@@ -143,14 +143,14 @@ const Consultation = () => {
           type="date"
           value={followUp}
           onChange={(e) => setFollowUp(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10"
+          className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-white/5 border border-white/10 text-sm"
         />
       </Section>
 
       {/* SAVE */}
       <button
         onClick={handleSubmit}
-        className="mt-8 w-full py-4 bg-teal-400 text-black rounded-xl font-bold text-lg hover:scale-[1.02] transition"
+        className="mt-6 sm:mt-8 w-full py-3 sm:py-4 bg-teal-400 text-black rounded-xl font-bold text-sm sm:text-lg hover:scale-[1.02] transition"
       >
         Complete Consultation
       </button>
@@ -163,8 +163,8 @@ export default Consultation;
 /* ================= COMPONENTS ================= */
 
 const Section = ({ title, children }: any) => (
-  <div className="mb-6">
-    <p className="text-xs text-gray-500 mb-2 tracking-wider uppercase">
+  <div className="mb-5 sm:mb-6">
+    <p className="text-[10px] sm:text-xs text-gray-500 mb-2 tracking-wider uppercase">
       {title}
     </p>
     {children}
@@ -184,6 +184,6 @@ const Input = ({
     value={value}
     onChange={(e) => onChange(e.target.value)}
     placeholder={placeholder}
-    className="w-full px-4 py-3 mt-2 rounded-xl bg-white/5 border border-white/10 outline-none"
+    className="w-full px-3 sm:px-4 py-2 sm:py-3 mt-2 rounded-xl bg-white/5 border border-white/10 outline-none text-sm"
   />
 );

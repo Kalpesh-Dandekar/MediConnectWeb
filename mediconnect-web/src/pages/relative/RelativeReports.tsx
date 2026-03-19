@@ -26,42 +26,42 @@ const RelativeReports = () => {
   const uploaded = reports.filter((r) => r.status === "Uploaded");
 
   return (
-    <div className="w-full space-y-10">
+    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-10">
 
-      {/* ===== HEADER ===== */}
+      {/* HEADER */}
       <div>
-        <h1 className="text-3xl font-bold">Reports</h1>
-        <p className="text-sm text-white/60 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold">Reports</h1>
+        <p className="text-xs sm:text-sm text-white/60 mt-1">
           Monitoring: Rahul Sharma
         </p>
       </div>
 
-      {/* ===== SUMMARY ===== */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {/* SUMMARY */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <SummaryCard label="Total" value="6" icon={FileText} color="blue" />
         <SummaryCard label="Pending" value="2" icon={Clock} color="orange" />
         <SummaryCard label="Available" value="4" icon={CheckCircle} color="green" />
       </div>
 
-      {/* ===== MAIN GRID ===== */}
-      <div className="grid grid-cols-12 gap-6">
+      {/* MAIN GRID */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">
 
-        {/* ===== LEFT ===== */}
-        <div className="col-span-12 xl:col-span-6">
+        {/* LEFT */}
+        <div className="xl:col-span-6">
           <SectionTitle title="Pending Reports" />
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
             {pending.map((r, i) => (
               <ReportCard key={i} {...r} />
             ))}
           </div>
         </div>
 
-        {/* ===== RIGHT ===== */}
-        <div className="col-span-12 xl:col-span-6">
+        {/* RIGHT */}
+        <div className="xl:col-span-6">
           <SectionTitle title="Available Reports" />
 
-          <div className="space-y-4 mt-4">
+          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
             {uploaded.map((r, i) => (
               <ReportCard key={i} {...r} />
             ))}
@@ -76,7 +76,7 @@ const RelativeReports = () => {
 
 export default RelativeReports;
 
-/* ===== SUMMARY CARD ===== */
+/* SUMMARY CARD */
 
 const SummaryCard = ({
   label,
@@ -96,19 +96,19 @@ const SummaryCard = ({
   };
 
   return (
-    <div className="p-6 rounded-2xl bg-gradient-to-br from-[#14283C] to-[#1a3654] border border-white/5 shadow-lg hover:scale-[1.02] transition">
+    <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-[#14283C] to-[#1a3654] border border-white/5 shadow-lg hover:scale-[1.02] transition">
 
       <div className="flex justify-between items-center">
 
         <div>
-          <p className="text-sm text-white/70">{label}</p>
-          <h2 className={`text-3xl font-bold mt-2 ${styles[color].split(" ")[0]}`}>
+          <p className="text-xs sm:text-sm text-white/70">{label}</p>
+          <h2 className={`text-xl sm:text-3xl font-bold mt-1 sm:mt-2 ${styles[color].split(" ")[0]}`}>
             {value}
           </h2>
         </div>
 
-        <div className="p-3 bg-white/5 rounded-lg">
-          <Icon size={18} className={styles[color].split(" ")[0]} />
+        <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
+          <Icon size={16} className={styles[color].split(" ")[0]} />
         </div>
 
       </div>
@@ -117,15 +117,15 @@ const SummaryCard = ({
   );
 };
 
-/* ===== SECTION TITLE ===== */
+/* SECTION TITLE */
 
 const SectionTitle = ({ title }: { title: string }) => (
-  <p className="text-xs tracking-widest text-white/50 uppercase">
+  <p className="text-[10px] sm:text-xs tracking-widest text-white/50 uppercase">
     {title}
   </p>
 );
 
-/* ===== REPORT CARD ===== */
+/* REPORT CARD */
 
 const ReportCard = ({
   title,
@@ -139,28 +139,32 @@ const ReportCard = ({
     : "text-orange-400 bg-orange-500/10";
 
   return (
-    <div className="p-5 rounded-2xl bg-[#14283C] border border-white/5 hover:scale-[1.01] hover:shadow-lg transition-all duration-300">
+    <div className="p-4 sm:p-5 rounded-2xl bg-[#14283C] border border-white/5 hover:scale-[1.01] hover:shadow-lg transition">
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
 
         {/* ICON */}
-        <div className="p-3 bg-white/5 rounded-lg">
-          <FileText size={16} className="text-purple-400" />
+        <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
+          <FileText size={14} className="text-purple-400" />
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1">
-          <p className="font-semibold">{title}</p>
-          <p className="text-xs text-white/50 mt-1">{date}</p>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm sm:text-base truncate">
+            {title}
+          </p>
+          <p className="text-[10px] sm:text-xs text-white/50 mt-1">
+            {date}
+          </p>
         </div>
 
         {/* ACTION */}
         {isUploaded ? (
-          <button className="px-4 py-1.5 text-sm rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition">
+          <button className="px-3 sm:px-4 py-1 text-[10px] sm:text-sm rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition">
             View
           </button>
         ) : (
-          <span className={`px-3 py-1 text-xs rounded-full font-medium ${statusColor}`}>
+          <span className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded-full font-medium ${statusColor}`}>
             Pending
           </span>
         )}
