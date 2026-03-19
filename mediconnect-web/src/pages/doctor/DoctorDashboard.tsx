@@ -1,5 +1,3 @@
-import DoctorLayout from "../../layout/DoctorLayout";
-
 /* ================= MOCK DATA ================= */
 
 const doctorName = "Smith";
@@ -36,7 +34,7 @@ const DoctorDashboard = () => {
   const greeting = getGreeting();
 
   return (
-    <DoctorLayout>
+    <>
 
       {/* HEADER */}
       <div className="mb-10">
@@ -96,7 +94,7 @@ const DoctorDashboard = () => {
         </div>
       </div>
 
-    </DoctorLayout>
+    </>
   );
 };
 
@@ -112,25 +110,19 @@ function getGreeting() {
 }
 
 function getTodayDate() {
-  const now = new Date();
-  return now.toDateString();
+  return new Date().toDateString();
 }
 
 /* ================= METRIC CARD ================= */
 
-const MetricCard = ({
-  value,
-  label,
-  icon,
-  alert,
-}: any) => {
+const MetricCard = ({ value, label, icon, alert }: any) => {
   return (
     <div
       className={`p-6 rounded-2xl border ${
         alert
           ? "border-red-400/30 bg-red-400/5"
           : "border-white/10 bg-white/5"
-      } hover:scale-[1.02] transition`}
+      }`}
     >
       <div className="text-2xl mb-3">{icon}</div>
 
@@ -156,14 +148,12 @@ const PatientCard = ({
       : "text-blue-400";
 
   return (
-    <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
+    <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/10">
 
-      {/* TOKEN */}
       <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white/10 ${color}`}>
         {token}
       </div>
 
-      {/* INFO */}
       <div className="flex-1">
         <p className="font-semibold">
           {name} ({age})

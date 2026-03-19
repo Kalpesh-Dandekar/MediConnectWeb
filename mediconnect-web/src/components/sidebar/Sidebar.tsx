@@ -36,7 +36,7 @@ const Sidebar = () => {
   ];
 
   const doctorMenu: MenuItem[] = [
-    { label: "Dashboard", icon: LayoutDashboard, path: "/doctor/dashboard" },
+    { label: "Home", icon: LayoutDashboard, path: "/doctor/dashboard" },
     { label: "Appointments", icon: CalendarDays, path: "/doctor/appointments" },
     { label: "Patients", icon: Users, path: "/doctor/patients" },
     { label: "Profile", icon: User, path: "/doctor/profile" },

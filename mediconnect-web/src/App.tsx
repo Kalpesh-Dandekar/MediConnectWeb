@@ -6,7 +6,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
 import RoleDetailsPage from "./pages/auth/RoleDetailsPage";
 
-/* ✅ PATIENT PAGES (REAL ONES) */
+/* ================= PATIENT ================= */
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import Appointments from "./pages/patient/Appointments";
 import BookAppointment from "./pages/patient/BookAppointment";
@@ -14,7 +14,13 @@ import Emergency from "./pages/patient/Emergency";
 import Medicines from "./pages/patient/Medicines";
 import Reports from "./pages/patient/Reports";
 
-/* ================= COMPONENT ================= */
+/* ================= DOCTOR ================= */
+import DoctorLayout from "./layout/DoctorLayout";
+import DoctorDashboard from "./pages/doctor/DoctorDashboard";
+import Patients from "./pages/doctor/Patients";
+import Consultation from "./pages/doctor/Consultation";
+import Profile from "./pages/doctor/DoctorProfile";
+import DoctorAppointments from "./pages/doctor/TodayAppointments";
 
 function App() {
   return (
@@ -23,7 +29,7 @@ function App() {
       {/* ================= LANDING ================= */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* ================= AUTH FLOW ================= */}
+      {/* ================= AUTH ================= */}
       <Route path="/auth/role" element={<RoleSelectionPage />} />
       <Route path="/auth/register" element={<RegisterPage />} />
       <Route path="/auth/login" element={<LoginPage />} />
@@ -37,10 +43,31 @@ function App() {
       <Route path="/patient/medicines" element={<Medicines />} />
       <Route path="/patient/reports" element={<Reports />} />
 
-      {/* ✅ DEFAULT REDIRECT */}
-      <Route path="/dashboard" element={<Navigate to="/patient/dashboard" />} />
+      {/* ================= DOCTOR ================= */}
+      <Route path="/doctor" element={<DoctorLayout />}>
 
-      {/* ✅ FALLBACK */}
+        {/* DEFAULT */}
+        <Route index element={<Navigate to="dashboard" />} />
+
+        <Route path="dashboard" element={<DoctorDashboard />} />
+        <Route path="appointments" element={<DoctorAppointments />} />
+        <Route path="patients" element={<Patients />} />
+        <Route path="consultation" element={<Consultation />} />
+        <Route path="profile" element={<Profile />} />
+
+      </Route>
+
+      {/* ================= ROLE BASED REDIRECT ================= */}
+      <Route
+        path="/dashboard"
+        element={
+          localStorage.getItem("role") === "Doctor"
+            ? <Navigate to="/doctor/dashboard" />
+            : <Navigate to="/patient/dashboard" />
+        }
+      />
+
+      {/* ================= FALLBACK ================= */}
       <Route
         path="*"
         element={

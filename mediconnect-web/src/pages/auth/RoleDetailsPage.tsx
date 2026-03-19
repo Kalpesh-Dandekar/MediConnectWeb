@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -34,38 +32,34 @@ const RoleDetailsPage = () => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  /* ✅ ONLY FIXED PART */
   const handleSubmit = () => {
-  setLoading(true);
-  console.log(form);
+    setLoading(true);
+    console.log(form);
 
-  setTimeout(() => {
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
 
-    const role = localStorage.getItem("role");
+      const role = localStorage.getItem("role");
 
-    switch (role) {
-      case "Patient":
-        navigate("/patient/dashboard");
-        break;
+      if (!role) {
+        navigate("/auth/role");
+        return;
+      }
 
-      case "Doctor":
-        navigate("/doctor/dashboard");
-        break;
+      // 🔥 FIX: normalize roles properly
+      let path = "";
 
-      case "Staff":
-        navigate("/staff/dashboard");
-        break;
+      if (role === "Patient") path = "/patient/dashboard";
+      else if (role === "Doctor") path = "/doctor/dashboard";
+      else if (role === "Staff") path = "/staff/dashboard";
+      else if (role === "Caregiver") path = "/relative/dashboard"; // IMPORTANT
+      else path = "/auth/login";
 
-      case "Relative":
-        navigate("/relative/dashboard");
-        break;
+      navigate(path);
 
-      default:
-        navigate("/auth/login");
-    }
-
-  }, 1000);
-};
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#0C1B2A] via-[#0E1F31] to-[#16263A] text-white flex items-center justify-center px-6 lg:px-20">
@@ -162,40 +156,40 @@ function renderFields(role: string, handleChange: (k: string, v: string) => void
     case "Patient":
       return (
         <>
-          <Input label="Age" onChange={(v: string) => handleChange("age", v)} />
-          <Select label="Gender" options={["Male", "Female", "Other"]} onChange={(v: string) => handleChange("gender", v)} />
-          <Select label="Blood Group" options={["A+", "A-", "B+", "O+", "AB+"]} onChange={(v: string) => handleChange("bloodGroup", v)} />
-          <Input label="Emergency Contact" onChange={(v: string) => handleChange("emergency", v)} />
-          <Input label="City" onChange={(v: string) => handleChange("city", v)} />
+          <Input label="Age" onChange={(v) => handleChange("age", v)} />
+          <Select label="Gender" options={["Male", "Female", "Other"]} onChange={(v) => handleChange("gender", v)} />
+          <Select label="Blood Group" options={["A+", "A-", "B+", "O+", "AB+"]} onChange={(v) => handleChange("bloodGroup", v)} />
+          <Input label="Emergency Contact" onChange={(v) => handleChange("emergency", v)} />
+          <Input label="City" onChange={(v) => handleChange("city", v)} />
         </>
       );
 
     case "Doctor":
       return (
         <>
-          <Input label="Specialization" onChange={(v: string) => handleChange("specialization", v)} />
-          <Input label="Experience (Years)" onChange={(v: string) => handleChange("experience", v)} />
-          <Input label="License Number" onChange={(v: string) => handleChange("license", v)} />
-          <Input label="Contact Number" onChange={(v: string) => handleChange("phone", v)} />
+          <Input label="Specialization" onChange={(v) => handleChange("specialization", v)} />
+          <Input label="Experience (Years)" onChange={(v) => handleChange("experience", v)} />
+          <Input label="License Number" onChange={(v) => handleChange("license", v)} />
+          <Input label="Contact Number" onChange={(v) => handleChange("phone", v)} />
         </>
       );
 
-    case "Relative":
+    case "Caregiver":
       return (
         <>
-          <Select label="Relation Type" options={["Father", "Mother", "Spouse"]} onChange={(v: string) => handleChange("relation", v)} />
-          <Input label="Patient Name" onChange={(v: string) => handleChange("patientName", v)} />
-          <Input label="Patient Contact" onChange={(v: string) => handleChange("patientPhone", v)} />
+          <Select label="Relation Type" options={["Father", "Mother", "Spouse"]} onChange={(v) => handleChange("relation", v)} />
+          <Input label="Patient Name" onChange={(v) => handleChange("patientName", v)} />
+          <Input label="Patient Contact" onChange={(v) => handleChange("patientPhone", v)} />
         </>
       );
 
     case "Staff":
       return (
         <>
-          <Select label="Designation" options={["Nurse", "Admin", "Technician"]} onChange={(v: string) => handleChange("designation", v)} />
-          <Input label="Department" onChange={(v: string) => handleChange("department", v)} />
-          <Input label="Staff ID" onChange={(v: string) => handleChange("staffId", v)} />
-          <Input label="Contact Number" onChange={(v: string) => handleChange("phone", v)} />
+          <Select label="Designation" options={["Nurse", "Admin", "Technician"]} onChange={(v) => handleChange("designation", v)} />
+          <Input label="Department" onChange={(v) => handleChange("department", v)} />
+          <Input label="Staff ID" onChange={(v) => handleChange("staffId", v)} />
+          <Input label="Contact Number" onChange={(v) => handleChange("phone", v)} />
         </>
       );
 
@@ -226,7 +220,7 @@ function Select({ label, options, onChange }: SelectProps) {
       defaultValue=""
     >
       <option value="" disabled>{label}</option>
-      {options.map((opt: string) => (
+      {options.map((opt) => (
         <option key={opt} value={opt}>{opt}</option>
       ))}
     </select>
