@@ -42,95 +42,111 @@ const TodayAppointments = () => {
   const countByStatus = (status: string) =>
     appointments.filter((a) => a.status === status).length;
 
-  const getColor = (status: string) => {
-    if (status === "Waiting") return "bg-orange-400";
-    if (status === "In Consultation") return "bg-blue-400";
-    return "bg-green-400";
+  const getStyles = (status: string) => {
+    if (status === "Waiting")
+      return {
+        dot: "bg-orange-400",
+        badge: "bg-orange-500/10 text-orange-400",
+        btn: "bg-orange-500/20 text-orange-300 hover:bg-orange-500/30",
+      };
+    if (status === "In Consultation")
+      return {
+        dot: "bg-blue-400",
+        badge: "bg-blue-500/10 text-blue-400",
+        btn: "bg-blue-500/20 text-blue-300 hover:bg-blue-500/30",
+      };
+    return {
+      dot: "bg-green-400",
+      badge: "bg-green-500/10 text-green-400",
+      btn: "bg-green-500/20 text-green-300 hover:bg-green-500/30",
+    };
   };
 
   return (
-    <div className="min-h-screen bg-[#0C1B2A] text-white">
+    <div className="w-full space-y-8">
 
-      <div className="px-8 py-6 max-w-[1200px] mx-auto">
+      {/* HEADER */}
+      <div>
+        <h1 className="text-3xl font-bold">
+          Today's Appointments
+        </h1>
+        <p className="text-white/60 text-sm mt-1">
+          {filtered.length} {selectedFilter} patients
+        </p>
+      </div>
 
-        {/* HEADER */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">
-            Today's Appointments
-          </h1>
-          <p className="text-gray-400 mt-1 text-sm">
-            {filtered.length} {selectedFilter} patients
-          </p>
-        </div>
+      {/* FILTERS */}
+      <div className="flex flex-wrap gap-3">
+        {["Waiting", "In Consultation", "Completed"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setSelectedFilter(f as any)}
+            className={`px-4 py-2 rounded-xl text-sm transition ${
+              selectedFilter === f
+                ? "bg-white/10 text-white"
+                : "text-white/60 hover:bg-white/5"
+            }`}
+          >
+            {f} ({countByStatus(f)})
+          </button>
+        ))}
+      </div>
 
-        {/* FILTERS */}
-        <div className="flex gap-3 mb-6">
-          {["Waiting", "In Consultation", "Completed"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setSelectedFilter(f as any)}
-              className={`px-4 py-2 rounded-xl text-sm transition ${
-                selectedFilter === f
-                  ? "bg-white/10 text-white"
-                  : "text-gray-400 hover:bg-white/5"
-              }`}
-            >
-              {f} ({countByStatus(f)})
-            </button>
-          ))}
-        </div>
+      {/* LIST */}
+      <div className="space-y-4">
 
-        {/* LIST */}
-        <div className="space-y-4">
+        {filtered.length === 0 ? (
+          <div className="p-6 rounded-xl bg-[#14283C] text-white/60">
+            No patients in {selectedFilter}
+          </div>
+        ) : (
+          filtered.map((item, i) => {
+            const style = getStyles(item.status);
 
-          {filtered.length === 0 ? (
-            <p className="text-gray-400">
-              No patients in {selectedFilter}
-            </p>
-          ) : (
-            filtered.map((item, i) => (
+            return (
               <div
                 key={i}
-                className="flex items-center bg-white/5 rounded-xl overflow-hidden border border-white/10"
+                className="flex items-center justify-between p-5 rounded-2xl 
+                           bg-[#14283C] border border-white/5 
+                           hover:scale-[1.01] hover:shadow-lg transition-all duration-300"
               >
 
-                {/* STATUS STRIP */}
-                <div
-                  className={`w-1 h-full ${getColor(item.status)}`}
-                />
+                {/* LEFT */}
+                <div className="flex items-center gap-4">
 
-                {/* CONTENT */}
-                <div className="flex items-center justify-between w-full p-4">
-
-                  {/* LEFT */}
-                  <div className="flex items-center gap-4">
-
-                    <div
-                      className={`w-10 h-10 flex items-center justify-center rounded-full text-black font-bold ${getColor(
-                        item.status
-                      )}`}
-                    >
-                      {item.token}
-                    </div>
-
-                    <div>
-                      <p className="font-semibold">
-                        {item.name} ({item.age})
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {item.reason}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {item.time}
-                      </p>
-                    </div>
+                  {/* TOKEN */}
+                  <div
+                    className={`w-11 h-11 flex items-center justify-center rounded-full font-bold text-black ${style.dot}`}
+                  >
+                    {item.token}
                   </div>
 
-                  {/* BUTTON */}
+                  {/* INFO */}
+                  <div>
+                    <p className="font-semibold">
+                      {item.name} ({item.age})
+                    </p>
+                    <p className="text-sm text-white/60">
+                      {item.reason}
+                    </p>
+                    <p className="text-xs text-white/40">
+                      {item.time}
+                    </p>
+                  </div>
+
+                </div>
+
+                {/* RIGHT */}
+                <div className="flex items-center gap-4">
+
+                  {/* STATUS BADGE */}
+                  <span className={`px-3 py-1 text-xs rounded-full ${style.badge}`}>
+                    {item.status}
+                  </span>
+
+                  {/* ACTION */}
                   <button
-                    className={`px-4 py-2 rounded-lg text-black text-sm font-semibold ${getColor(
-                      item.status
-                    )}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${style.btn}`}
                   >
                     {item.status === "Completed"
                       ? "View"
@@ -138,20 +154,38 @@ const TodayAppointments = () => {
                       ? "Continue"
                       : "Start"}
                   </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
 
-        {/* SUMMARY */}
-        <div className="mt-10 flex justify-around bg-white/5 p-4 rounded-xl border border-white/10">
-          <Summary label="Waiting" count={countByStatus("Waiting")} color="text-orange-400" />
-          <Summary label="In Progress" count={countByStatus("In Consultation")} color="text-blue-400" />
-          <Summary label="Completed" count={countByStatus("Completed")} color="text-green-400" />
-        </div>
+                </div>
+
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* SUMMARY */}
+      <div className="grid grid-cols-3 gap-6">
+
+        <Summary
+          label="Waiting"
+          count={countByStatus("Waiting")}
+          color="text-orange-400"
+        />
+
+        <Summary
+          label="In Progress"
+          count={countByStatus("In Consultation")}
+          color="text-blue-400"
+        />
+
+        <Summary
+          label="Completed"
+          count={countByStatus("Completed")}
+          color="text-green-400"
+        />
 
       </div>
+
     </div>
   );
 };
@@ -170,9 +204,9 @@ const Summary = ({
   color: string;
 }) => {
   return (
-    <div className="text-center">
-      <p className={`font-bold ${color}`}>{count}</p>
-      <p className="text-xs text-gray-400">{label}</p>
+    <div className="p-6 rounded-2xl bg-gradient-to-br from-[#14283C] to-[#1a3654] border border-white/5 text-center hover:scale-[1.02] transition">
+      <p className={`text-3xl font-bold ${color}`}>{count}</p>
+      <p className="text-xs text-white/60 mt-1">{label}</p>
     </div>
   );
 };

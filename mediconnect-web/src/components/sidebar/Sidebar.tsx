@@ -4,34 +4,39 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   CalendarDays,
-  AlertTriangle,
-  Pill,
   FileText,
   Users,
   User,
+  Pill,
   LogOut,
+  AlertTriangle, // ✅ added
 } from "lucide-react";
 
 type MenuItem = {
   label: string;
   icon: any;
   path: string;
-  isEmergency?: boolean;
 };
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const role = localStorage.getItem("role") || "Patient";
+  /* ================= ROLE FIX ================= */
+
+  const rawRole = localStorage.getItem("role");
+  let role = rawRole?.trim().toLowerCase() || "patient";
+
+  if (role === "caregiver") role = "relative";
 
   /* ================= MENUS ================= */
 
+  // ✅ FULLY MATCHES FLUTTER PATIENT NAV
   const patientMenu: MenuItem[] = [
     { label: "Home", icon: LayoutDashboard, path: "/patient/dashboard" },
     { label: "Appointments", icon: CalendarDays, path: "/patient/appointments" },
-    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency", isEmergency: true },
-    { label: "Medicines", icon: Pill, path: "/patient/medicines" },
+    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency" }, // ✅ added
+    { label: "Medicines", icon: Pill, path: "/patient/medicines" }, // ✅ added
     { label: "Reports", icon: FileText, path: "/patient/reports" },
   ];
 
@@ -42,12 +47,40 @@ const Sidebar = () => {
     { label: "Profile", icon: User, path: "/doctor/profile" },
   ];
 
+  const staffMenu: MenuItem[] = [
+    { label: "Home", icon: LayoutDashboard, path: "/staff/dashboard" },
+    { label: "Appointments", icon: CalendarDays, path: "/staff/appointments" },
+    { label: "Reports", icon: FileText, path: "/staff/reports" },
+    { label: "Patients", icon: Users, path: "/staff/patients" },
+    { label: "Profile", icon: User, path: "/staff/profile" },
+  ];
+
+  const relativeMenu: MenuItem[] = [
+    { label: "Home", icon: LayoutDashboard, path: "/relative/dashboard" },
+    { label: "Medications", icon: Pill, path: "/relative/medications" },
+    { label: "Reports", icon: FileText, path: "/relative/reports" },
+    { label: "Profile", icon: User, path: "/relative/profile" },
+  ];
+
   const menuByRole: Record<string, MenuItem[]> = {
-    Patient: patientMenu,
-    Doctor: doctorMenu,
+    patient: patientMenu,
+    doctor: doctorMenu,
+    staff: staffMenu,
+    relative: relativeMenu,
   };
 
   const menu = menuByRole[role] || patientMenu;
+
+  /* ================= ROLE COLORS ================= */
+
+  const roleColors: any = {
+    doctor: "text-teal-400",
+    staff: "text-blue-400",
+    relative: "text-purple-400",
+    patient: "text-orange-400",
+  };
+
+  const activeColor = roleColors[role] || roleColors["patient"];
 
   /* ================= LOGOUT ================= */
 
@@ -56,69 +89,71 @@ const Sidebar = () => {
     navigate("/auth/login");
   };
 
+  /* ================= UI ================= */
+
   return (
     <aside className="w-64 bg-[#0E1F31] border-r border-white/10 flex flex-col p-6">
 
-      {/* LOGO */}
+      {/* ===== LOGO ===== */}
       <div className="flex items-center gap-3 mb-10">
-        <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-          <span
-            className={`font-bold text-lg ${
-              role === "Doctor" ? "text-teal-400" : "text-orange-400"
-            }`}
-          >
-            {role === "Doctor" ? "D" : "M"}
+
+        {/* M LOGO */}
+        <div className="w-11 h-11 rounded-full bg-orange-500/20 flex items-center justify-center shadow-inner">
+          <span className="font-bold text-lg text-orange-400">
+            M
           </span>
         </div>
-        <span className="text-lg font-semibold">
-          {role === "Doctor" ? "Doctor Panel" : "MediConnect"}
+
+        <span className="text-lg font-semibold tracking-wide">
+          MediConnect
         </span>
       </div>
 
-      {/* MENU */}
+      {/* ===== MENU ===== */}
       <nav className="flex-1 space-y-2">
+
         {menu.map((item, index) => {
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname.startsWith(item.path);
           const Icon = item.icon;
-
-          const activeColor =
-            role === "Doctor"
-              ? "text-teal-400"
-              : item.isEmergency
-              ? "text-red-500"
-              : "text-orange-400";
-
-          const inactiveColor =
-            item.isEmergency && role === "Patient"
-              ? "text-red-400/70"
-              : "text-gray-400";
 
           return (
             <button
               key={index}
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition
+              className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300
               ${
                 isActive
                   ? `bg-white/10 ${activeColor}`
-                  : `${inactiveColor} hover:bg-white/5`
+                  : `text-gray-400 hover:bg-white/5 hover:text-white`
               }`}
             >
-              <Icon size={20} />
-              <span className="text-sm font-medium">{item.label}</span>
+              <Icon
+                size={20}
+                className={`transition ${
+                  isActive ? activeColor : "group-hover:text-white"
+                }`}
+              />
+
+              <span className="text-sm font-medium">
+                {item.label}
+              </span>
             </button>
           );
         })}
+
       </nav>
 
-      {/* LOGOUT */}
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition mt-6"
-      >
-        <LogOut size={20} />
-        <span className="text-sm">Logout</span>
-      </button>
+      {/* ===== LOGOUT ===== */}
+      <div className="pt-6 border-t border-white/10 mt-6">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl 
+                     text-red-400 hover:bg-red-500/10 transition"
+        >
+          <LogOut size={20} />
+          <span className="text-sm font-medium">Logout</span>
+        </button>
+      </div>
 
     </aside>
   );

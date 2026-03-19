@@ -1,9 +1,10 @@
 "use client";
 
+import React from "react";
 import { Outlet } from "react-router-dom";
-import Sidebar from "../components/sidebar/Sidebar"; // ✅ same shared sidebar
+import Sidebar from "../components/sidebar/Sidebar";
 
-const DoctorLayout = () => {
+const StaffLayout: React.FC = () => {
   return (
     <div className="flex h-screen w-full bg-[#0C1B2A] text-white">
 
@@ -19,4 +20,4 @@ const DoctorLayout = () => {
   );
 };
 
-export default DoctorLayout;
+export default StaffLayout;
