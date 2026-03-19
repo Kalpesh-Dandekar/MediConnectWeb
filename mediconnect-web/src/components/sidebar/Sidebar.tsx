@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -10,9 +9,7 @@ import {
   User,
   Pill,
   LogOut,
-  AlertTriangle,
-  Menu,
-  X,
+  AlertTriangle, // ✅ added
 } from "lucide-react";
 
 type MenuItem = {
@@ -25,8 +22,6 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [isOpen, setIsOpen] = useState(false); // 🔥 mobile toggle
-
   /* ================= ROLE FIX ================= */
 
   const rawRole = localStorage.getItem("role");
@@ -36,11 +31,12 @@ const Sidebar = () => {
 
   /* ================= MENUS ================= */
 
+  // ✅ FULLY MATCHES FLUTTER PATIENT NAV
   const patientMenu: MenuItem[] = [
     { label: "Home", icon: LayoutDashboard, path: "/patient/dashboard" },
     { label: "Appointments", icon: CalendarDays, path: "/patient/appointments" },
-    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency" },
-    { label: "Medicines", icon: Pill, path: "/patient/medicines" },
+    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency" }, // ✅ added
+    { label: "Medicines", icon: Pill, path: "/patient/medicines" }, // ✅ added
     { label: "Reports", icon: FileText, path: "/patient/reports" },
   ];
 
@@ -75,7 +71,7 @@ const Sidebar = () => {
 
   const menu = menuByRole[role] || patientMenu;
 
-  /* ================= COLORS ================= */
+  /* ================= ROLE COLORS ================= */
 
   const roleColors: any = {
     doctor: "text-teal-400",
@@ -93,23 +89,29 @@ const Sidebar = () => {
     navigate("/auth/login");
   };
 
-  /* ================= SIDEBAR UI ================= */
+  /* ================= UI ================= */
 
-  const SidebarContent = (
-    <div className="h-full flex flex-col p-6">
+  return (
+    <aside className="w-64 bg-[#0E1F31] border-r border-white/10 flex flex-col p-6">
 
-      {/* LOGO */}
+      {/* ===== LOGO ===== */}
       <div className="flex items-center gap-3 mb-10">
-        <div className="w-11 h-11 rounded-full bg-orange-500/20 flex items-center justify-center">
-          <span className="font-bold text-lg text-orange-400">M</span>
+
+        {/* M LOGO */}
+        <div className="w-11 h-11 rounded-full bg-orange-500/20 flex items-center justify-center shadow-inner">
+          <span className="font-bold text-lg text-orange-400">
+            M
+          </span>
         </div>
+
         <span className="text-lg font-semibold tracking-wide">
           MediConnect
         </span>
       </div>
 
-      {/* MENU */}
+      {/* ===== MENU ===== */}
       <nav className="flex-1 space-y-2">
+
         {menu.map((item, index) => {
           const isActive = location.pathname.startsWith(item.path);
           const Icon = item.icon;
@@ -117,10 +119,7 @@ const Sidebar = () => {
           return (
             <button
               key={index}
-              onClick={() => {
-                navigate(item.path);
-                setIsOpen(false); // 🔥 auto close mobile
-              }}
+              onClick={() => navigate(item.path)}
               className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300
               ${
                 isActive
@@ -130,65 +129,33 @@ const Sidebar = () => {
             >
               <Icon
                 size={20}
-                className={isActive ? activeColor : "group-hover:text-white"}
+                className={`transition ${
+                  isActive ? activeColor : "group-hover:text-white"
+                }`}
               />
-              <span className="text-sm font-medium">{item.label}</span>
+
+              <span className="text-sm font-medium">
+                {item.label}
+              </span>
             </button>
           );
         })}
+
       </nav>
 
-      {/* LOGOUT */}
+      {/* ===== LOGOUT ===== */}
       <div className="pt-6 border-t border-white/10 mt-6">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl 
+                     text-red-400 hover:bg-red-500/10 transition"
         >
           <LogOut size={20} />
           <span className="text-sm font-medium">Logout</span>
         </button>
       </div>
-    </div>
-  );
 
-  return (
-    <>
-      {/* 🔥 MOBILE TOP BAR */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-[#0E1F31] border-b border-white/10">
-        <button onClick={() => setIsOpen(true)}>
-          <Menu className="text-white" />
-        </button>
-
-        <span className="font-semibold">MediConnect</span>
-      </div>
-
-      {/* 🔥 DESKTOP SIDEBAR */}
-      <aside className="hidden lg:flex w-64 bg-[#0E1F31] border-r border-white/10">
-        {SidebarContent}
-      </aside>
-
-      {/* 🔥 MOBILE DRAWER */}
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <div
-            className="fixed inset-0 bg-black/50 z-40"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* Drawer */}
-          <aside className="fixed top-0 left-0 w-64 h-full bg-[#0E1F31] z-50 border-r border-white/10 shadow-xl">
-            <div className="flex justify-end p-4">
-              <button onClick={() => setIsOpen(false)}>
-                <X className="text-white" />
-              </button>
-            </div>
-
-            {SidebarContent}
-          </aside>
-        </>
-      )}
-    </>
+    </aside>
   );
 };
 
