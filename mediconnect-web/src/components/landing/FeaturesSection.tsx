@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Calendar, Pill, Siren } from "lucide-react"
 
 const features = [
@@ -47,12 +46,8 @@ const FeaturesSection = () => {
             const Icon = f.icon
 
             return (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                viewport={{ once: true }}
                 className="
                   group relative
                   p-5 sm:p-6 md:p-8 rounded-2xl
@@ -95,7 +90,7 @@ const FeaturesSection = () => {
                   group-hover:w-16
                 " />
 
-              </motion.div>
+              </div>
             )
           })}
 

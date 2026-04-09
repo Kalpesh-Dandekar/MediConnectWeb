@@ -1,7 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
-
 const points = [
   {
     title: "Faster Emergency Response",
@@ -46,12 +44,8 @@ const ImpactSection = () => {
         <div className="mt-12 sm:mt-16 md:mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 text-center">
 
           {stats.map((s, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              viewport={{ once: true }}
               className="
                 p-5 sm:p-6 md:p-8 rounded-2xl
                 bg-white/[0.04] backdrop-blur-xl
@@ -67,7 +61,7 @@ const ImpactSection = () => {
               <p className="mt-2 sm:mt-3 text-sm sm:text-base text-gray-400">
                 {s.label}
               </p>
-            </motion.div>
+            </div>
           ))}
 
         </div>
@@ -76,12 +70,8 @@ const ImpactSection = () => {
         <div className="mt-12 sm:mt-16 md:mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
 
           {points.map((p, i) => (
-            <motion.div
+            <div
               key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: i * 0.15 }}
-              viewport={{ once: true }}
               className="
                 group relative
                 p-5 sm:p-6 md:p-8 rounded-2xl
@@ -110,7 +100,7 @@ const ImpactSection = () => {
                 group-hover:w-16
               " />
 
-            </motion.div>
+            </div>
           ))}
 
         </div>

@@ -20,17 +20,26 @@ const Footer = () => {
           {/* 🔹 CENTER LINKS */}
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-gray-400">
 
-            <span className="hover:text-white cursor-pointer transition">
+            <button
+              className="hover:text-white transition"
+              type="button"
+            >
               Features
-            </span>
+            </button>
 
-            <span className="hover:text-white cursor-pointer transition">
+            <button
+              className="hover:text-white transition"
+              type="button"
+            >
               About
-            </span>
+            </button>
 
-            <span className="hover:text-white cursor-pointer transition">
+            <button
+              className="hover:text-white transition"
+              type="button"
+            >
               Contact
-            </span>
+            </button>
 
           </div>
 

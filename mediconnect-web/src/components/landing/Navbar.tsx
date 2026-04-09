@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 
 const Navbar = () => {
@@ -9,12 +8,8 @@ const Navbar = () => {
   return (
     <div className="fixed top-4 md:top-6 left-0 right-0 z-50 px-4 sm:px-6 md:px-10">
 
-      <motion.div
-        initial={{ y: -40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="max-w-7xl mx-auto flex items-center justify-between"
-      >
+      {/* removed motion wrapper for faster first paint */}
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
 
         {/* 🔥 LOGO */}
         <h1
@@ -51,7 +46,7 @@ const Navbar = () => {
           Get Started
         </button>
 
-      </motion.div>
+      </div>
 
     </div>
   )

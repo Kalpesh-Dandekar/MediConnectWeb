@@ -1,18 +1,13 @@
 "use client"
 
-import { motion } from "framer-motion"
-
 const CTASection = () => {
   return (
     <section className="relative py-20 sm:py-28 md:py-36">
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-10">
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
+        {/* removed motion wrapper for performance */}
+        <div
           className="
             relative overflow-hidden
             rounded-2xl sm:rounded-3xl
@@ -92,7 +87,7 @@ const CTASection = () => {
 
           </div>
 
-        </motion.div>
+        </div>
 
       </div>
     </section>
