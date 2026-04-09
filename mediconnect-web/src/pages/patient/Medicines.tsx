@@ -1,7 +1,10 @@
-import DashboardLayout from "../../layout/DashboardLayout";
-import { useState } from "react";
+"use client";
 
-/* ================= MOCK DATA ================= */
+import { useEffect, useState } from "react";
+import {
+  listenToTodayMedicines,
+  updateMedicineStatus
+} from "../../services/patient/medicineService";
 
 type DoseStatus = "pending" | "taken" | "missed";
 
@@ -12,32 +15,60 @@ type Dose = {
   status: DoseStatus;
 };
 
-const initialData: Record<string, Dose[]> = {
-  Morning: [
-    { id: "1", name: "Paracetamol", time: "09:00 AM", status: "pending" },
-    { id: "2", name: "Vitamin D", time: "10:00 AM", status: "taken" },
-  ],
-  Afternoon: [
-    { id: "3", name: "Antibiotic", time: "02:00 PM", status: "pending" },
-  ],
-  Night: [
-    { id: "4", name: "Painkiller", time: "09:00 PM", status: "missed" },
-  ],
-};
-
-/* ================= COMPONENT ================= */
-
 const Medicines = () => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<Record<string, Dose[]>>({});
+  const [loading, setLoading] = useState(true);
 
-  const toggleDose = (period: string, id: string) => {
+  /* 🔥 FETCH REAL DATA */
+  useEffect(() => {
+    try {
+      const unsub = listenToTodayMedicines((snapshot: any) => {
+        const grouped: Record<string, Dose[]> = {};
+
+        snapshot?.docs?.forEach((doc: any) => {
+          const d = doc.data();
+
+          const period = d.period || "Morning";
+
+          const dose: Dose = {
+            id: doc.id,
+            name: d.name || "Medicine",
+            time: d.time || "--",
+            status: d.status || "pending",
+          };
+
+          if (!grouped[period]) grouped[period] = [];
+          grouped[period].push(dose);
+        });
+
+        setData(grouped);
+        setLoading(false);
+      });
+
+      return () => {
+        if (unsub) unsub();
+      };
+
+    } catch (err) {
+      console.error("❌ Fetch Medicines Error:", err);
+      setLoading(false);
+    }
+  }, []);
+
+  /* 🔥 TOGGLE */
+  const toggleDose = async (period: string, id: string) => {
     const updated = { ...data };
 
     updated[period] = updated[period].map((dose) => {
       if (dose.id === id) {
         let next: DoseStatus = "pending";
+
         if (dose.status === "pending") next = "taken";
         else if (dose.status === "taken") next = "missed";
+
+        updateMedicineStatus(id, next).catch((err) => {
+          console.error("❌ Update Error:", err);
+        });
 
         return { ...dose, status: next };
       }
@@ -47,162 +78,106 @@ const Medicines = () => {
     setData(updated);
   };
 
-  const allDoses = Object.values(data).flat();
-
-  const total = allDoses.length;
-  const taken = allDoses.filter((d) => d.status === "taken").length;
+  const all = Object.values(data).flat();
+  const total = all.length;
+  const taken = all.filter((d) => d.status === "taken").length;
 
   const adherence = total === 0 ? 0 : taken / total;
 
   const nextDose =
-    allDoses.find((d) => d.status === "pending")?.time || "All completed";
+    all.find((d) => d.status === "pending")?.time || "All completed";
 
   return (
-    <DashboardLayout>
+    <div className="w-full max-w-screen-xl mx-auto">
 
-      <div className="w-full max-w-screen-xl mx-auto">
-
-        {/* HEADER */}
-        <div className="mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl font-semibold">Medication</h1>
-          <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm">
-            Daily treatment & compliance overview
-          </p>
-        </div>
-
-        {/* TODAY */}
-        <p className="text-[10px] sm:text-xs tracking-widest text-gray-500 mb-3 sm:mb-4">
-          TODAY
+      {/* HEADER */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold">Medication</h1>
+        <p className="text-gray-400 text-sm">
+          Daily treatment & compliance overview
         </p>
-
-        <div className="space-y-4 sm:space-y-6 mb-8 sm:mb-10">
-          {Object.entries(data).map(([period, doses]) => (
-            <div key={period}>
-
-              <p className="text-[10px] sm:text-xs text-gray-500 mb-2 sm:mb-3">
-                {period.toUpperCase()}
-              </p>
-
-              <div className="space-y-2 sm:space-y-3">
-                {doses.map((dose) => (
-                  <div
-                    key={dose.id}
-                    onClick={() => toggleDose(period, dose.id)}
-                    className={`p-3 sm:p-5 rounded-xl border cursor-pointer transition flex items-center justify-between gap-3
-                    ${
-                      dose.status === "taken"
-                        ? "border-green-400/40 bg-green-400/5"
-                        : dose.status === "missed"
-                        ? "border-red-400/40 bg-red-400/5"
-                        : "border-white/10 bg-white/5 hover:bg-white/10"
-                    }`}
-                  >
-                    {/* LEFT */}
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm sm:text-base truncate">
-                        {dose.name}
-                      </p>
-                      <p className="text-xs sm:text-sm text-gray-400">
-                        {dose.time}
-                      </p>
-                    </div>
-
-                    {/* STATUS */}
-                    <StatusChip status={dose.status} />
-                  </div>
-                ))}
-              </div>
-
-            </div>
-          ))}
-        </div>
-
-        {/* ADHERENCE */}
-        <div className="mb-8 sm:mb-10 p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10">
-
-          <div className="flex justify-between mb-2 sm:mb-3">
-            <p className="font-semibold text-sm sm:text-base">Adherence Today</p>
-            <p className="text-teal-400 font-semibold text-sm sm:text-base">
-              {(adherence * 100).toFixed(0)}%
-            </p>
-          </div>
-
-          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-2 sm:mb-3">
-            <div
-              className="h-full bg-teal-400"
-              style={{ width: `${adherence * 100}%` }}
-            />
-          </div>
-
-          <p className="text-xs sm:text-sm text-gray-400">
-            {taken} of {total} doses completed • Next: {nextDose}
-          </p>
-
-          <p className="text-[10px] sm:text-xs text-orange-400 mt-2">
-            🔥 3 day medication streak
-          </p>
-        </div>
-
-        {/* ACTIVE */}
-        <p className="text-[10px] sm:text-xs tracking-widest text-gray-500 mb-3 sm:mb-4">
-          ACTIVE TREATMENT
-        </p>
-
-        <div className="p-4 sm:p-6 rounded-2xl bg-white/5 border border-white/10">
-
-          <p className="font-semibold mb-1 sm:mb-2 text-sm sm:text-base">
-            Antibiotic Course
-          </p>
-
-          <p className="text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3">
-            10 Day Course • 4 Days Completed
-          </p>
-
-          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-3 sm:mb-4">
-            <div className="h-full bg-teal-400 w-[40%]" />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <p className="text-xs sm:text-sm text-gray-400">
-              Escalation Alert
-            </p>
-
-            <input type="checkbox" className="accent-teal-400" defaultChecked />
-          </div>
-
-        </div>
-
       </div>
 
-    </DashboardLayout>
+      {/* TODAY */}
+      <p className="text-xs text-gray-500 mb-4">TODAY</p>
+
+      {/* LOADING */}
+      {loading ? (
+        <p className="text-gray-400 text-sm">Loading medicines...</p>
+      ) : Object.keys(data).length === 0 ? (
+        <p className="text-gray-400 text-sm">No medicines for today</p>
+      ) : (
+        Object.entries(data).map(([period, doses]) => (
+          <div key={period} className="mb-6">
+
+            <p className="text-xs text-gray-500 mb-2">
+              {period.toUpperCase()}
+            </p>
+
+            {doses.map((dose) => (
+              <div
+                key={dose.id}
+                onClick={() => toggleDose(period, dose.id)}
+                className={`p-4 rounded-xl border cursor-pointer mb-2 flex justify-between
+                ${
+                  dose.status === "taken"
+                    ? "border-green-400/40 bg-green-400/5"
+                    : dose.status === "missed"
+                    ? "border-red-400/40 bg-red-400/5"
+                    : "border-white/10 bg-white/5"
+                }`}
+              >
+                <div>
+                  <p>{dose.name}</p>
+                  <p className="text-sm text-gray-400">{dose.time}</p>
+                </div>
+
+                <StatusChip status={dose.status} />
+              </div>
+            ))}
+
+          </div>
+        ))
+      )}
+
+      {/* ADHERENCE */}
+      <div className="mt-8 p-6 rounded-xl bg-white/5 border border-white/10">
+
+        <div className="flex justify-between mb-2">
+          <p>Adherence Today</p>
+          <p className="text-teal-400">{(adherence * 100).toFixed(0)}%</p>
+        </div>
+
+        <div className="h-2 bg-white/10 rounded mb-2">
+          <div
+            className="h-full bg-teal-400"
+            style={{ width: `${adherence * 100}%` }}
+          />
+        </div>
+
+        <p className="text-sm text-gray-400">
+          {taken} of {total} doses • Next: {nextDose}
+        </p>
+      </div>
+
+    </div>
   );
 };
 
 export default Medicines;
 
-/* ================= STATUS CHIP ================= */
+/* ================= CHIP ================= */
 
 const StatusChip = ({ status }: { status: DoseStatus }) => {
-  const config = {
-    pending: {
-      text: "Pending",
-      color: "text-orange-400 bg-orange-400/10",
-    },
-    taken: {
-      text: "Taken",
-      color: "text-green-400 bg-green-400/10",
-    },
-    missed: {
-      text: "Missed",
-      color: "text-red-400 bg-red-400/10",
-    },
+  const map = {
+    pending: "text-orange-400 bg-orange-400/10",
+    taken: "text-green-400 bg-green-400/10",
+    missed: "text-red-400 bg-red-400/10",
   };
 
   return (
-    <span
-      className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold ${config[status].color}`}
-    >
-      {config[status].text}
+    <span className={`px-3 py-1 rounded-full text-xs ${map[status]}`}>
+      {status}
     </span>
   );
 };

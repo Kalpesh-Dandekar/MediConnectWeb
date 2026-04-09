@@ -1,126 +1,122 @@
 "use client";
 
-import { Pill } from "lucide-react";
+import { useEffect, useState } from "react";
+import { listenToPatientMedicines } from "../../services/relative/medicineService";
+import { getLinkedPatient } from "../../services/relative/dashboardService";
 
-type Medication = {
+/* ================= TYPES ================= */
+
+type Dose = {
+  id: string;
   name: string;
   time: string;
-  status: "Taken" | "Missed" | "Upcoming";
+  status: "taken" | "missed" | "pending";
+  period: string;
 };
 
+/* ================= COMPONENT ================= */
+
 const RelativeMedications = () => {
-  const medications: Medication[] = [
-    {
-      name: "Pantoprazole 40mg",
-      time: "08:00 AM",
-      status: "Taken",
-    },
-    {
-      name: "Vitamin D3",
-      time: "02:00 PM",
-      status: "Missed",
-    },
-    {
-      name: "Calcium Tablet",
-      time: "08:00 PM",
-      status: "Upcoming",
-    },
-  ];
+  const [patient, setPatient] = useState<any>(null);
+  const [grouped, setGrouped] = useState<Record<string, Dose[]>>({});
+  const [loading, setLoading] = useState(true);
 
-  const completed = medications.filter((m) => m.status !== "Upcoming");
-  const upcoming = medications.filter((m) => m.status === "Upcoming");
+  /* INIT */
+  useEffect(() => {
+    init();
+  }, []);
 
-  const takenCount = medications.filter((m) => m.status === "Taken").length;
-  const percent = Math.round((takenCount / medications.length) * 100);
+  const init = async () => {
+    const p = await getLinkedPatient();
+
+    if (!p) {
+      setLoading(false);
+      return;
+    }
+
+    setPatient(p);
+
+    listenToPatientMedicines(p.id, (list: any[]) => {
+      const groupedData: Record<string, Dose[]> = {};
+
+      list.forEach((d) => {
+        const period = (d.period || "Morning") as string;
+
+        if (!groupedData[period]) groupedData[period] = [];
+
+        groupedData[period].push({
+          id: d.id,
+          name: d.name || "",
+          time: d.time || "",
+          status: d.status || "pending",
+          period,
+        });
+      });
+
+      setGrouped(groupedData);
+      setLoading(false);
+    });
+  };
+
+  /* ================= CALCULATIONS ================= */
+
+  const all: Dose[] = Object.values(grouped).flat();
+
+  const total = all.length;
+  const taken = all.filter((d) => d.status === "taken").length;
+
+  const percent = total ? Math.round((taken / total) * 100) : 0;
+
+  const nextDose =
+    all.find((d) => d.status === "pending")?.time || "All done";
+
+  if (loading) return <p className="text-white p-10">Loading...</p>;
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-10">
+    <div className="max-w-screen-xl mx-auto space-y-6">
 
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">
-          Today's Medications
-        </h1>
-        <p className="text-xs sm:text-sm text-white/60 mt-1">
-          Monitoring: Rahul Sharma
+        <h1 className="text-2xl font-bold">Medication</h1>
+        <p className="text-white/60">
+          Monitoring: {patient?.name || "Patient"}
         </p>
       </div>
 
       {/* PROGRESS */}
-      <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-[#14283C] to-[#1a3654] border border-white/5 shadow-lg">
+      <div className="p-6 rounded-2xl bg-[#14283C]">
+        <p className="text-white/60">Adherence Today</p>
 
-        <div className="flex justify-between items-center">
-          <p className="text-xs sm:text-sm text-white/70">
-            Today's Completion
-          </p>
-          <span className="text-purple-400 font-semibold text-xs sm:text-sm">
-            {percent}%
-          </span>
+        <div className="mt-2 text-white font-semibold">
+          {percent}%
         </div>
 
-        <div className="mt-3 sm:mt-4 w-full bg-white/10 rounded-full h-2 overflow-hidden">
+        <div className="mt-2 w-full bg-white/10 h-2 rounded">
           <div
-            className="h-2 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full"
+            className="h-2 bg-teal-400 rounded"
             style={{ width: `${percent}%` }}
           />
         </div>
 
-        <p className="text-[10px] sm:text-xs text-white/50 mt-2 sm:mt-3">
-          {takenCount} of {medications.length} doses taken
+        <p className="text-xs text-white/50 mt-2">
+          {taken} of {total} doses • Next: {nextDose}
         </p>
-
       </div>
 
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">
+      {/* GROUPED LIST */}
+      {Object.keys(grouped).map((period) => (
+        <div key={period}>
+          <p className="text-xs text-white/50 uppercase mb-2">
+            {period}
+          </p>
 
-        {/* LEFT */}
-        <div className="xl:col-span-8 space-y-4 sm:space-y-8">
-
-          {/* COMPLETED */}
-          <div>
-            <SectionTitle title="Completed / Missed" />
-
-            <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
-              {completed.map((m, i) => (
-                <MedicationCard key={i} {...m} />
-              ))}
-            </div>
+          <div className="space-y-3">
+            {grouped[period].map((d) => (
+              <Card key={d.id} {...d} />
+            ))}
           </div>
-
-          {/* UPCOMING */}
-          <div>
-            <SectionTitle title="Upcoming" />
-
-            <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
-              {upcoming.map((m, i) => (
-                <MedicationCard key={i} {...m} />
-              ))}
-            </div>
-          </div>
-
         </div>
-
-        {/* RIGHT */}
-        <div className="xl:col-span-4">
-
-          <div className="p-4 sm:p-6 rounded-2xl bg-[#14283C] border border-white/5">
-            <p className="text-[10px] sm:text-xs tracking-widest text-white/50 mb-3 sm:mb-5">
-              MEDICATION INFO
-            </p>
-
-            <div className="space-y-3 sm:space-y-5 text-xs sm:text-sm">
-
-              <InfoRow label="Total Doses" value="3" />
-              <InfoRow label="Taken" value="2" highlight="green" />
-              <InfoRow label="Missed" value="1" highlight="red" />
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+      ))}
 
     </div>
   );
@@ -128,87 +124,28 @@ const RelativeMedications = () => {
 
 export default RelativeMedications;
 
-/* SECTION TITLE */
+/* ================= CARD ================= */
 
-const SectionTitle = ({ title }: { title: string }) => (
-  <p className="text-[10px] sm:text-xs tracking-widest text-white/50 uppercase">
-    {title}
-  </p>
-);
-
-/* MEDICATION CARD */
-
-const MedicationCard = ({
-  name,
-  time,
-  status,
-}: {
-  name: string;
-  time: string;
-  status: string;
-}) => {
-  let color = "";
-
-  if (status === "Taken") {
-    color = "text-green-400 bg-green-500/10";
-  } else if (status === "Missed") {
-    color = "text-red-400 bg-red-500/10";
-  } else {
-    color = "text-orange-400 bg-orange-500/10";
-  }
+const Card = ({ name, time, status }: Dose) => {
+  const color =
+    status === "taken"
+      ? "text-green-400"
+      : status === "missed"
+      ? "text-red-400"
+      : "text-orange-400";
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-[#14283C] border border-white/5 hover:scale-[1.01] hover:shadow-lg transition">
+    <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex justify-between">
 
-      <div className="flex items-center gap-3 sm:gap-4">
-
-        <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
-          <Pill size={14} className="text-purple-400" />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm sm:text-base truncate">
-            {name}
-          </p>
-          <p className="text-[10px] sm:text-xs text-white/50 mt-1">
-            {time}
-          </p>
-        </div>
-
-        <span className={`px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded-full font-medium ${color}`}>
-          {status}
-        </span>
-
+      <div>
+        <p className="text-white">{name}</p>
+        <p className="text-xs text-white/50">{time || "--"}</p>
       </div>
 
-    </div>
-  );
-};
-
-/* INFO ROW */
-
-const InfoRow = ({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: "green" | "red";
-}) => {
-  const color =
-    highlight === "green"
-      ? "text-green-400"
-      : highlight === "red"
-      ? "text-red-400"
-      : "";
-
-  return (
-    <div className="flex justify-between items-center">
-      <span className="text-white/60 text-xs sm:text-sm">{label}</span>
-      <span className={`font-medium text-xs sm:text-sm ${color}`}>
-        {value}
+      <span className={color}>
+        {status.toUpperCase()}
       </span>
+
     </div>
   );
 };

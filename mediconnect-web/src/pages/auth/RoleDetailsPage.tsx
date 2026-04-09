@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../services/firebase";
+import { saveRoleDetails } from "../../services/authService";
 
 /* ================= TYPES ================= */
 
@@ -34,20 +36,22 @@ const RoleDetailsPage = () => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSubmit = () => {
-    setLoading(true);
-    console.log(form);
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
+      const user = auth.currentUser;
 
-      const role = localStorage.getItem("role");
-
-      if (!role) {
-        navigate("/auth/role");
+      if (!user) {
+        alert("User not logged in");
+        navigate("/auth/login");
         return;
       }
 
+      // 🔥 SAVE PROFILE (same as Flutter backend)
+      await saveRoleDetails(user.uid, form);
+
+      // 🔥 REDIRECT BASED ON ROLE
       let path = "";
 
       if (role === "Patient") path = "/patient/dashboard";
@@ -57,16 +61,19 @@ const RoleDetailsPage = () => {
       else path = "/auth/login";
 
       navigate(path);
-    }, 1000);
+
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#0C1B2A] via-[#0E1F31] to-[#16263A] text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 overflow-x-hidden">
 
-      {/* MAIN CONTAINER */}
       <div className="w-full max-w-[1400px]">
 
-        {/* HEADER */}
         <div className="mb-8 sm:mb-10 text-center lg:text-left">
           <button
             onClick={() => navigate(-1)}
@@ -85,7 +92,6 @@ const RoleDetailsPage = () => {
           </h1>
         </div>
 
-        {/* GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 items-center">
 
           {/* LEFT */}
@@ -128,7 +134,6 @@ const RoleDetailsPage = () => {
                 {renderFields(role, handleChange)}
               </div>
 
-              {/* BUTTON */}
               <button
                 onClick={handleSubmit}
                 className="mt-6 sm:mt-8 w-full py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black hover:scale-[1.02] transition flex justify-center"

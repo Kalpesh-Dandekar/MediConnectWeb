@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../../services/authService";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -14,14 +15,43 @@ const RegisterPage = () => {
     confirm: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const role = localStorage.getItem("role") || "User";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    console.log(form);
+  const handleSubmit = async () => {
+    try {
+      if (!form.name || !form.email || !form.password || !form.confirm) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      if (form.password !== form.confirm) {
+        alert("Passwords do not match");
+        return;
+      }
+
+      setLoading(true);
+
+      await registerUser(
+        form.email,
+        form.password,
+        form.name,
+        role
+      );
+
+      alert("Registration successful!");
+      navigate("/auth/login");
+
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,7 +67,6 @@ const RegisterPage = () => {
           transition={{ duration: 0.6 }}
           className="relative flex flex-col justify-center text-center lg:text-left"
         >
-          {/* Glow Effects */}
           <div className="absolute -top-16 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 
             w-[250px] sm:w-[300px] md:w-[400px] 
             h-[250px] sm:h-[300px] md:h-[400px] 
@@ -146,7 +175,7 @@ const RegisterPage = () => {
               onClick={handleSubmit}
               className="mt-6 sm:mt-8 w-full py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black hover:scale-[1.02] active:scale-95 transition shadow-lg shadow-orange-500/20"
             >
-              Create Account
+              {loading ? "..." : "Create Account"}
             </button>
 
             {/* LOGIN REDIRECT */}

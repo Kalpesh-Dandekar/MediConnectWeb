@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { loginUser, signInWithGoogle, getUserData } from "../../services/authService";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,23 +19,56 @@ const LoginPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    setLoading(true);
-    console.log(form);
+  // 🔥 CENTRALIZED ROUTING (FINAL)
+  const handleRouting = async (uid: string) => {
+    const data = await getUserData(uid);
 
-    setTimeout(() => {
-      setLoading(false);
-
-      const role = localStorage.getItem("role");
-
-      if (!role) {
-        alert("Role not selected. Please restart flow.");
-        navigate("/auth/role");
-        return;
-      }
-
+    if (!data?.role) {
+      navigate("/auth/role");
+    } 
+    else if (!data?.profileCompleted) {
       navigate("/auth/details");
-    }, 1000);
+    } 
+    else {
+      if (data.role === "Patient") navigate("/patient/dashboard");
+      else if (data.role === "Doctor") navigate("/doctor/dashboard");
+      else if (data.role === "Staff") navigate("/staff/dashboard");
+      else if (data.role === "Caregiver") navigate("/relative/dashboard");
+      else navigate("/auth/login");
+    }
+  };
+
+  // 🔹 Email Login
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+
+      const user = await loginUser(form.email, form.password);
+
+      await handleRouting(user.uid);
+
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔥 Google Login (FIXED FLOW)
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+
+      const user = await signInWithGoogle();
+
+      // 🔥 ALWAYS use DB routing (no manual navigation)
+      await handleRouting(user.uid);
+
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -101,11 +135,20 @@ const LoginPage = () => {
 
             </div>
 
+            {/* Email Login */}
             <button
               onClick={handleSubmit}
               className="mt-6 sm:mt-8 w-full py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black flex justify-center hover:scale-[1.02] active:scale-95 transition"
             >
               {loading ? "..." : "Login"}
+            </button>
+
+            {/* Google Login */}
+            <button
+              onClick={handleGoogleLogin}
+              className="mt-4 w-full py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-semibold bg-white text-black hover:scale-[1.02] transition"
+            >
+              Continue with Google
             </button>
 
           </div>

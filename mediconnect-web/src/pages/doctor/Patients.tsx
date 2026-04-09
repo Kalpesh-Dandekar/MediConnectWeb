@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { listenToPatients } from "../../services/doctor/patientService";
+
+/* ================= TYPES ================= */
 
 type Patient = {
   id: string;
@@ -11,7 +14,10 @@ type Patient = {
   diagnosis: string;
   status: "Active" | "Follow-up";
   visitedToday: boolean;
+  appointmentId: string;
 };
+
+/* ================= COMPONENT ================= */
 
 const Patients = () => {
   const navigate = useNavigate();
@@ -21,26 +27,23 @@ const Patients = () => {
     "All" | "Active" | "Follow-up"
   >("All");
 
-  const patients: Patient[] = [
-    {
-      id: "P-1021",
-      name: "Rahul Sharma",
-      age: 34,
-      lastVisit: "24 Mar 2025",
-      diagnosis: "Gastritis",
-      status: "Active",
-      visitedToday: false,
-    },
-    {
-      id: "P-1044",
-      name: "Priya Mehta",
-      age: 29,
-      lastVisit: "18 Mar 2025",
-      diagnosis: "Vitamin D Deficiency",
-      status: "Follow-up",
-      visitedToday: true,
-    },
-  ];
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  /* ================= REALTIME ================= */
+
+  useEffect(() => {
+    const unsub = listenToPatients((data: Patient[]) => {
+      setPatients(data);
+      setLoading(false);
+    });
+
+    return () => {
+      if (unsub) unsub();
+    };
+  }, []);
+
+  /* ================= FILTER ================= */
 
   const filteredPatients = patients.filter((p) => {
     const matchFilter =
@@ -52,6 +55,8 @@ const Patients = () => {
 
     return matchFilter && matchSearch;
   });
+
+  /* ================= UI ================= */
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
@@ -93,65 +98,71 @@ const Patients = () => {
 
       {/* LIST */}
       <div className="space-y-3 sm:space-y-4">
-        {filteredPatients.map((p, i) => (
-          <div
-            key={i}
-            className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4"
-          >
 
-            {/* TOP */}
-            <div className="flex items-center justify-between gap-3">
+        {loading ? (
+          <div className="text-gray-400 text-sm">Loading...</div>
+        ) : filteredPatients.length === 0 ? (
+          <div className="text-gray-400 text-sm">No patients found</div>
+        ) : (
+          filteredPatients.map((p) => (
+            <div
+              key={p.id}
+              className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4"
+            >
 
-              <div className="flex items-center gap-3 min-w-0">
+              {/* TOP */}
+              <div className="flex items-center justify-between gap-3">
 
-                {/* AVATAR */}
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-400/20 flex items-center justify-center text-teal-300 font-bold text-sm">
-                  {p.name[0]}
+                <div className="flex items-center gap-3 min-w-0">
+
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-400/20 flex items-center justify-center text-teal-300 font-bold text-sm">
+                    {p.name[0]}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm sm:text-base truncate">
+                      {p.name}
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-gray-400">
+                      {p.id} • Age: {p.age}
+                    </p>
+                  </div>
                 </div>
 
-                {/* INFO */}
-                <div className="min-w-0">
-                  <p className="font-semibold text-sm sm:text-base truncate">
-                    {p.name}
-                  </p>
-                  <p className="text-[10px] sm:text-xs text-gray-400">
-                    {p.id} • Age: {p.age}
-                  </p>
-                </div>
+                <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs bg-teal-400/20 text-teal-300">
+                  {p.status}
+                </span>
               </div>
 
-              {/* STATUS */}
-              <span className="px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs bg-teal-400/20 text-teal-300 whitespace-nowrap">
-                {p.status}
-              </span>
-            </div>
+              {/* DETAILS */}
+              <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-300">
+                <p>Diagnosis: {p.diagnosis}</p>
+                <p className="text-gray-500 text-[10px] sm:text-xs mt-1">
+                  Last Visit: {p.lastVisit}
+                </p>
+              </div>
 
-            {/* DETAILS */}
-            <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-300">
-              <p className="truncate">Diagnosis: {p.diagnosis}</p>
-              <p className="text-gray-500 text-[10px] sm:text-xs mt-1">
-                Last Visit: {p.lastVisit}
-              </p>
+              {/* BUTTON */}
+              <button
+                onClick={() =>
+                  navigate("/doctor/consultation", {
+                    state: {
+                      patientId: p.id,
+                      patientName: p.name,
+                      appointmentId: p.appointmentId,
+                    },
+                  })
+                }
+                className="mt-3 sm:mt-4 w-full py-2 rounded-lg bg-teal-400 text-black font-semibold text-sm hover:scale-[1.02] transition"
+              >
+                {p.visitedToday
+                  ? "Continue Consultation"
+                  : "Start Consultation"}
+              </button>
             </div>
+          ))
+        )}
 
-            {/* BUTTON */}
-            <button
-              onClick={() =>
-                navigate("/doctor/consultation", {
-                  state: {
-                    patientId: p.id,
-                    patientName: p.name,
-                  },
-                })
-              }
-              className="mt-3 sm:mt-4 w-full py-2 rounded-lg bg-teal-400 text-black font-semibold text-sm hover:scale-[1.02] transition"
-            >
-              {p.visitedToday
-                ? "Continue Consultation"
-                : "Start Consultation"}
-            </button>
-          </div>
-        ))}
       </div>
     </div>
   );

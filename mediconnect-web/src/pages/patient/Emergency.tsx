@@ -1,151 +1,121 @@
-import DashboardLayout from "../../layout/DashboardLayout";
+"use client";
 
-/* ================= COMPONENT ================= */
+import { useState } from "react";
+import { createEmergency } from "../../services/patient/emergencyService";
 
 const Emergency = () => {
-  const handleAction = (msg: string) => {
-    alert(msg);
+
+  const [loadingType, setLoadingType] = useState<string | null>(null);
+
+  const handleEmergency = async (type: string, msg: string) => {
+    try {
+      if (loadingType) return;
+
+      setLoadingType(type);
+
+      console.log("🚨 Triggering emergency:", type);
+
+      await createEmergency(type);
+
+      alert(msg);
+
+    } catch (err: any) {
+      console.error("❌ Emergency Failed:", err);
+      alert(err.message || "Failed to send emergency");
+    } finally {
+      setLoadingType(null);
+    }
   };
 
   return (
-    <DashboardLayout>
+    <div className="max-w-3xl mx-auto">
 
-      <div className="w-full max-w-screen-xl mx-auto">
+      {/* HEADER */}
+      <h1 className="text-2xl sm:text-3xl font-semibold text-white">
+        Emergency Assistance
+      </h1>
+      <p className="text-gray-400 mt-2 text-sm">
+        Immediate help & urgent medical support
+      </p>
 
-        {/* HEADER */}
-        <div className="mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-red-400">
-            Emergency Assistance
-          </h1>
-          <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm">
-            Immediate help & urgent medical support
-          </p>
+      {/* 🔴 CRITICAL */}
+      <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-[#8B1E1E] to-[#5C1212] shadow-lg">
+
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">⚠️</span>
+          <h2 className="text-lg font-semibold text-white">
+            Critical Emergency
+          </h2>
         </div>
 
-        {/* CRITICAL EMERGENCY */}
-        <div className="mb-6 sm:mb-8 p-4 sm:p-7 rounded-2xl bg-gradient-to-br from-red-900/60 to-red-700/30 border border-red-500/30">
+        <p className="text-white/70 mt-3 text-sm">
+          For severe symptoms, accidents, chest pain or breathing difficulty.
+        </p>
 
-          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-            <span className="text-2xl sm:text-3xl">⚠️</span>
-            <h2 className="text-lg sm:text-xl font-semibold">Critical Emergency</h2>
-          </div>
-
-          <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
-            For severe symptoms, accidents, chest pain or breathing difficulty,
-            contact emergency services immediately.
-          </p>
-
-          <button
-            onClick={() => handleAction("Ambulance request sent")}
-            className="w-full py-3 sm:py-4 rounded-xl bg-red-500 hover:bg-red-600 transition font-semibold text-sm sm:text-base"
-          >
-            CALL AMBULANCE (108)
-          </button>
-        </div>
-
-        {/* GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-
-          {/* LEFT */}
-          <div className="space-y-6 sm:space-y-8">
-
-            {/* CONNECT DOCTOR */}
-            <div className="p-4 sm:p-6 rounded-2xl bg-[#14283C] border border-white/10">
-              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                <span className="text-xl sm:text-2xl text-teal-400">👨‍⚕️</span>
-                <h3 className="font-semibold text-sm sm:text-base">
-                  Connect to Available Doctor
-                </h3>
-              </div>
-
-              <p className="text-[10px] sm:text-xs text-gray-400 mb-4 sm:mb-5">
-                Doctors Online: 3 • Avg wait time: 2 mins
-              </p>
-
-              <button
-                onClick={() => handleAction("Doctor request sent")}
-                className="w-full py-2 sm:py-3 rounded-lg bg-teal-400 text-black font-semibold text-sm sm:text-base hover:scale-[1.01] transition"
-              >
-                CONNECT NOW
-              </button>
-            </div>
-
-            {/* ALERT CAREGIVER */}
-            <button
-              onClick={() => handleAction("Caregiver alerted")}
-              className="w-full py-3 sm:py-4 rounded-xl bg-[#14283C] border border-white/10 text-teal-400 font-semibold text-sm sm:text-base hover:bg-white/5 transition"
-            >
-              Alert Caregiver
-            </button>
-
-          </div>
-
-          {/* RIGHT */}
-          <div>
-
-            <p className="text-[10px] sm:text-xs tracking-widest text-gray-500 mb-3 sm:mb-4">
-              EMERGENCY CONTACTS
-            </p>
-
-            <div className="space-y-3 sm:space-y-4">
-
-              <ContactTile
-                title="City Care Hospital"
-                subtitle="2.3 km away"
-                icon="🏥"
-              />
-
-              <ContactTile
-                title="Primary Doctor"
-                subtitle="Dr. Michael Smith"
-                icon="👨‍⚕️"
-              />
-
-              <ContactTile
-                title="Emergency Contact"
-                subtitle="John Doe (Relative)"
-                icon="👪"
-              />
-
-            </div>
-
-          </div>
-
-        </div>
+        <button
+          onClick={() => handleEmergency("ambulance", "Ambulance requested 🚑")}
+          className="mt-5 w-full py-3 rounded-xl bg-red-500 text-white font-semibold"
+        >
+          {loadingType === "ambulance" ? "Sending..." : "CALL AMBULANCE (108)"}
+        </button>
 
       </div>
 
-    </DashboardLayout>
+      {/* 🩺 DOCTOR */}
+      <div className="mt-6 p-6 rounded-2xl bg-white/5 border border-white/10">
+
+        <h2 className="text-white font-semibold">
+          Connect to Available Doctor
+        </h2>
+
+        <p className="text-gray-400 text-sm mt-2">
+          Doctors Online: 3 • Avg wait time: 2 mins
+        </p>
+
+        <button
+          onClick={() => handleEmergency("doctor", "Doctor request sent 👨‍⚕️")}
+          className="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black font-semibold"
+        >
+          {loadingType === "doctor" ? "Connecting..." : "CONNECT NOW"}
+        </button>
+
+      </div>
+
+      {/* CONTACTS */}
+      <div className="mt-8">
+        <p className="text-xs tracking-widest text-gray-500 mb-4">
+          EMERGENCY CONTACTS
+        </p>
+
+        <Contact title="City Care Hospital" sub="2.3 km away" />
+        <Contact title="Primary Doctor" sub="Dr. Smith" />
+        <Contact title="Emergency Contact" sub="Relative" />
+      </div>
+
+      {/* CAREGIVER */}
+      <button
+        onClick={() => handleEmergency("caregiver", "Caregiver alerted 👨‍👩‍👧")}
+        className="mt-8 w-full py-3 rounded-xl border border-white/10 text-teal-400"
+      >
+        {loadingType === "caregiver" ? "Sending..." : "Alert Caregiver"}
+      </button>
+
+    </div>
   );
 };
 
 export default Emergency;
 
-/* ================= CONTACT TILE ================= */
+/* ================= CONTACT ================= */
 
-const ContactTile = ({
-  title,
-  subtitle,
-  icon,
-}: {
-  title: string;
-  subtitle: string;
-  icon: string;
-}) => {
+const Contact = ({ title, sub }: any) => {
   return (
-    <div className="p-3 sm:p-5 rounded-xl bg-[#14283C] border border-white/10 flex items-center gap-3 sm:gap-4 hover:bg-[#16314A] transition">
-
-      <div className="text-lg sm:text-xl text-red-400">{icon}</div>
-
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm sm:text-base truncate">{title}</p>
-        <p className="text-xs sm:text-sm text-gray-400 truncate">{subtitle}</p>
+    <div className="mb-4 p-4 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center">
+      <div>
+        <p className="text-white font-medium">{title}</p>
+        <p className="text-gray-400 text-sm">{sub}</p>
       </div>
-
-      <button className="text-teal-400 text-sm sm:text-base hover:scale-110 transition">
-        📞
-      </button>
-
+      <span className="text-teal-400">📞</span>
     </div>
   );
 };

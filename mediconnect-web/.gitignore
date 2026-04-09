@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables (IMPORTANT)
+.env
+.env.*
+
+# Vercel
+.vercel
+
+# Build artifacts (extra safety)
+build
+
+# Coverage (optional)
+coverage

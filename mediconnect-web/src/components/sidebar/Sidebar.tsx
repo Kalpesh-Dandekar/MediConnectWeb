@@ -16,6 +16,7 @@ type MenuItem = {
   label: string;
   icon: any;
   path: string;
+  danger?: boolean;
 };
 
 const Sidebar = () => {
@@ -34,7 +35,7 @@ const Sidebar = () => {
   const patientMenu: MenuItem[] = [
     { label: "Home", icon: LayoutDashboard, path: "/patient/dashboard" },
     { label: "Appointments", icon: CalendarDays, path: "/patient/appointments" },
-    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency" },
+    { label: "Emergency", icon: AlertTriangle, path: "/patient/emergency", danger: true },
     { label: "Medicines", icon: Pill, path: "/patient/medicines" },
     { label: "Reports", icon: FileText, path: "/patient/reports" },
   ];
@@ -46,11 +47,11 @@ const Sidebar = () => {
     { label: "Profile", icon: User, path: "/doctor/profile" },
   ];
 
+  /* 🔥 FIXED STAFF MENU (MATCHES FLUTTER EXACTLY) */
   const staffMenu: MenuItem[] = [
     { label: "Home", icon: LayoutDashboard, path: "/staff/dashboard" },
     { label: "Appointments", icon: CalendarDays, path: "/staff/appointments" },
-    { label: "Reports", icon: FileText, path: "/staff/reports" },
-    { label: "Patients", icon: Users, path: "/staff/patients" },
+    { label: "Emergency", icon: AlertTriangle, path: "/staff/emergency", danger: true },
     { label: "Profile", icon: User, path: "/staff/profile" },
   ];
 
@@ -109,22 +110,31 @@ const Sidebar = () => {
         {menu.map((item, index) => {
           const isActive = location.pathname.startsWith(item.path);
           const Icon = item.icon;
+          const isDanger = item.danger;
+
+          const activeStyles = isDanger
+            ? "bg-red-500/10 text-red-400"
+            : `bg-white/10 ${activeColor}`;
+
+          const inactiveStyles = isDanger
+            ? "text-red-300 hover:bg-red-500/10 hover:text-red-400"
+            : "text-gray-400 hover:bg-white/5 hover:text-white";
 
           return (
             <button
               key={index}
               onClick={() => navigate(item.path)}
               className={`group w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300
-              ${
-                isActive
-                  ? `bg-white/10 ${activeColor}`
-                  : `text-gray-400 hover:bg-white/5 hover:text-white`
-              }`}
+              ${isActive ? activeStyles : inactiveStyles}`}
             >
               <Icon
                 size={20}
                 className={`transition ${
-                  isActive ? activeColor : "group-hover:text-white"
+                  isActive
+                    ? isDanger
+                      ? "text-red-400"
+                      : activeColor
+                    : "group-hover:text-white"
                 }`}
               />
 

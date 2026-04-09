@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom"; // 🔥 added Outlet
 import Sidebar from "../components/sidebar/Sidebar";
 import {
   LayoutDashboard,
@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode; // 🔥 made optional (safe)
 };
 
 const DashboardLayout: React.FC<Props> = ({ children }) => {
@@ -42,7 +42,10 @@ const DashboardLayout: React.FC<Props> = ({ children }) => {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 pb-20 lg:pb-6 bg-gradient-to-br from-[#0C1B2A] via-[#0E1F31] to-[#16263A]">
-        {children}
+        
+        {/* 🔥 FIX: support both old + new */}
+        {children ? children : <Outlet />}
+
       </main>
 
       {/* MOBILE BOTTOM NAV */}
@@ -50,7 +53,10 @@ const DashboardLayout: React.FC<Props> = ({ children }) => {
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0E1F31] border-t border-white/10 flex justify-around items-center py-2 lg:hidden">
 
           {mobileMenu.map((item, index) => {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive =
+              location.pathname === item.path ||
+              location.pathname.startsWith(item.path + "/"); // 🔥 improved
+
             const Icon = item.icon;
 
             return (
@@ -66,7 +72,6 @@ const DashboardLayout: React.FC<Props> = ({ children }) => {
               >
                 <Icon size={20} />
 
-                {/* LABEL */}
                 <span className="leading-none">
                   {item.label}
                 </span>

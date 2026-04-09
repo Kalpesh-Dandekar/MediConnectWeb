@@ -1,124 +1,118 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-/* ================= MOCK DATA ================= */
-
-const doctorName = "Smith";
-
-const metrics = [
-  { value: "12", label: "Today's Appointments", icon: "📅" },
-  { value: "5", label: "Waiting Patients", icon: "⏳" },
-  { value: "7", label: "Consultations Done", icon: "✅" },
-  { value: "1", label: "Emergency Flags", icon: "⚠️", alert: true },
-];
-
-const patients = [
-  {
-    token: "12",
-    name: "Rahul Sharma",
-    age: "34",
-    reason: "Gastric Pain",
-    time: "10:30 AM",
-    status: "Waiting",
-  },
-  {
-    token: "13",
-    name: "Priya Mehta",
-    age: "29",
-    reason: "Follow-up Visit",
-    time: "10:45 AM",
-    status: "Scheduled",
-  },
-];
+import {
+  getDoctorDashboardData,
+  listenToNextPatients,
+} from "../../services/doctor/dashboardService";
 
 /* ================= COMPONENT ================= */
 
 const DoctorDashboard = () => {
-  const greeting = getGreeting();
   const navigate = useNavigate();
+
+  const [data, setData] = useState({
+    total: 0,
+    waiting: 0,
+    done: 0,
+    emergency: 0,
+  });
+
+  const [patients, setPatients] = useState<any[]>([]);
+
+  /* ================= LOAD DATA ================= */
+
+  useEffect(() => {
+    loadDashboard();
+
+    const unsub = listenToNextPatients((list: any[]) => {
+      setPatients(list);
+    });
+
+    return () => unsub && unsub();
+  }, []);
+
+  const loadDashboard = async () => {
+    try {
+      const res = await getDoctorDashboardData();
+      setData(res);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const greeting = getGreeting();
+
+  /* ================= UI ================= */
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
 
       {/* HEADER */}
-      <div className="mb-8 sm:mb-10">
+      <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-semibold">
-          {greeting}, Dr. {doctorName} 👋
+          {greeting}, Doctor 👋
         </h1>
-
-        <p className="text-gray-400 mt-1 sm:mt-2 text-xs sm:text-sm">
-          {getTodayDate()}
+        <p className="text-gray-400 text-sm mt-1">
+          {new Date().toDateString()}
         </p>
       </div>
 
       {/* METRICS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
-        {metrics.map((m, i) => (
-          <MetricCard key={i} {...m} />
-        ))}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card value={data.total} label="Appointments" />
+        <Card value={data.waiting} label="Waiting" />
+        <Card value={data.done} label="Completed" />
+
+        {/* 🔥 CLICKABLE EMERGENCY */}
+        <Card
+          value={data.emergency}
+          label="Emergency"
+          alert
+          onClick={() => navigate("/doctor/emergency")}
+        />
       </div>
 
-      {/* QUICK ACTIONS */}
-      <div className="mb-8 sm:mb-10">
-        <p className="text-[10px] sm:text-xs tracking-widest text-gray-500 mb-3 sm:mb-4">
-          QUICK ACTIONS
-        </p>
+      {/* ACTIONS */}
+      <div className="mb-8 space-y-3">
 
-        <div className="space-y-3 sm:space-y-4">
+        <button
+          onClick={() => {
+            if (!patients.length) return alert("No patient");
+            navigate("/doctor/consultation", {
+              state: {
+                patientId: patients[0]?.patientId,
+                patientName: patients[0]?.patientName,
+                appointmentId: patients[0]?.id,
+              },
+            });
+          }}
+          className="w-full p-4 rounded-xl bg-teal-400 text-black font-semibold"
+        >
+          ▶ Start Consultation
+        </button>
 
-          {/* START CONSULTATION */}
-          <button
-            onClick={() =>
-              navigate("/doctor/consultation", {
-                state: {
-                  patientName: patients[0]?.name,
-                  patientId: patients[0]?.token,
-                },
-              })
-            }
-            className="w-full flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-teal-400 text-black font-semibold text-sm sm:text-base hover:scale-[1.01] transition"
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-lg sm:text-xl">▶️</span>
-              Start Next Consultation
-            </div>
-            <span>→</span>
-          </button>
+        <button
+          onClick={() => navigate("/doctor/view-reports")}
+          className="w-full p-4 rounded-xl bg-white/5 border border-white/10"
+        >
+          📄 Review Reports
+        </button>
 
-          {/* VIEW REPORTS */}
-          <button
-            onClick={() =>
-              navigate("/doctor/view-reports", {
-                state: {
-                  patientName: patients[0]?.name,
-                  patientId: patients[0]?.token,
-                },
-              })
-            }
-            className="w-full flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10 text-sm sm:text-base hover:bg-white/10 transition"
-          >
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-lg sm:text-xl">📄</span>
-              Review Patient Reports
-            </div>
-            <span className="text-gray-400">→</span>
-          </button>
-
-        </div>
       </div>
 
-      {/* NEXT PATIENTS */}
+      {/* PATIENT LIST */}
       <div>
-        <p className="text-[10px] sm:text-xs tracking-widest text-gray-500 mb-3 sm:mb-4">
-          NEXT PATIENTS
-        </p>
+        <p className="text-xs text-gray-500 mb-3">NEXT PATIENTS</p>
 
-        <div className="space-y-3 sm:space-y-4">
-          {patients.map((p, i) => (
+        {patients.length === 0 ? (
+          <p className="text-gray-400">No patients</p>
+        ) : (
+          patients.map((p, i) => (
             <PatientCard key={i} {...p} />
-          ))}
-        </div>
+          ))
+        )}
       </div>
 
     </div>
@@ -130,94 +124,48 @@ export default DoctorDashboard;
 /* ================= HELPERS ================= */
 
 function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good Morning";
-  if (hour < 17) return "Good Afternoon";
+  const h = new Date().getHours();
+  if (h < 12) return "Good Morning";
+  if (h < 17) return "Good Afternoon";
   return "Good Evening";
 }
 
-function getTodayDate() {
-  return new Date().toDateString();
-}
+/* ================= COMPONENTS ================= */
 
-/* ================= METRIC CARD ================= */
+const Card = ({ value, label, alert, onClick }: any) => (
+  <div
+    onClick={onClick}
+    className={`p-4 rounded-xl bg-white/5 border ${
+      alert ? "border-red-400/30 cursor-pointer hover:scale-[1.03]" : "border-white/10"
+    } transition`}
+  >
+    <p className="text-xl font-semibold">{value}</p>
+    <p className="text-gray-400 text-sm">{label}</p>
+  </div>
+);
 
-const MetricCard = ({ value, label, icon, alert }: any) => {
-  return (
-    <div
-      className={`p-4 sm:p-6 rounded-2xl border ${
-        alert
-          ? "border-red-400/30 bg-red-400/5"
-          : "border-white/10 bg-white/5"
-      }`}
-    >
-      <div className="text-xl sm:text-2xl mb-2 sm:mb-3">{icon}</div>
-      <p className="text-lg sm:text-2xl font-semibold">{value}</p>
-      <p className="text-xs sm:text-sm text-gray-400 mt-1">{label}</p>
-    </div>
-  );
-};
-
-/* ================= PATIENT CARD ================= */
-
-const PatientCard = ({
-  token,
-  name,
-  age,
-  reason,
-  time,
-  status,
-}: any) => {
+const PatientCard = (p: any) => {
   const navigate = useNavigate();
 
-  const color =
-    status === "Waiting"
-      ? "text-orange-400"
-      : "text-blue-400";
-
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 p-3 sm:p-5 rounded-2xl bg-white/5 border border-white/10">
+    <div className="p-4 mb-3 bg-white/5 rounded-xl border border-white/10">
 
-      {/* LEFT (CONSULTATION CLICK) */}
-      <div
+      <p className="font-semibold">{p.patientName}</p>
+      <p className="text-sm text-gray-400">{p.department}</p>
+
+      <button
         onClick={() =>
           navigate("/doctor/consultation", {
             state: {
-              patientName: name,
-              patientId: token,
+              patientId: p.patientId,
+              patientName: p.patientName,
+              appointmentId: p.id,
             },
           })
         }
-        className="flex items-center gap-3 sm:gap-4 cursor-pointer flex-1"
+        className="mt-2 text-teal-400 text-sm"
       >
-        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white/10 text-xs sm:text-sm ${color}`}>
-          {token}
-        </div>
-
-        <div className="min-w-0">
-          <p className="font-semibold text-sm sm:text-base truncate">
-            {name} ({age})
-          </p>
-          <p className="text-xs sm:text-sm text-gray-400 truncate">{reason}</p>
-          <p className={`text-[10px] sm:text-xs mt-1 ${color}`}>
-            {time} • {status}
-          </p>
-        </div>
-      </div>
-
-      {/* RIGHT BUTTON */}
-      <button
-        onClick={() =>
-          navigate("/doctor/view-reports", {
-            state: {
-              patientName: name,
-              patientId: token,
-            },
-          })
-        }
-        className="px-3 py-1.5 text-xs sm:text-sm rounded-lg bg-teal-400 text-black font-semibold"
-      >
-        View Reports
+        Start →
       </button>
 
     </div>

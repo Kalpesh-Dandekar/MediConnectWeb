@@ -1,110 +1,118 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { auth } from "../../services/firebase";
+import {
+  listenToStaffProfile,
+  updateStaffField,
+} from "../../services/staff/profileService";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Building2, Clock, Shield } from "lucide-react";
+
+/* ================= COMPONENT ================= */
 
 const StaffProfile = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    const unsub = listenToStaffProfile((d: any) => {
+      setData(d);
+    });
+
+    return () => unsub && unsub();
+  }, []);
+
+  const logout = async () => {
+    await auth.signOut();
     localStorage.clear();
     navigate("/auth/login");
   };
 
+  /* 🔥 EDIT */
+  const editField = async (
+    title: string,
+    field: string,
+    value: string
+  ) => {
+    const newVal = prompt(`Edit ${title}`, value);
+    if (!newVal || newVal.trim() === "") return;
+
+    await updateStaffField(field, newVal.trim());
+  };
+
+  if (!data) {
+    return <p className="text-white p-10">Loading...</p>;
+  }
+
+  const profile = data.profile || {};
+
+  const name = data.name || "Staff";
+  const email = data.email || "--";
+
+  const department = profile.department || "--";
+  const designation = profile.designation || "--";
+  const contact = profile.contactNumber || "--";
+
   return (
-    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-8">
+    <div className="max-w-screen-xl mx-auto space-y-6">
 
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-        <h1 className="text-2xl sm:text-3xl font-bold">Profile</h1>
+      <h1 className="text-2xl font-bold">Profile</h1>
 
-        <div className="hidden sm:flex items-center gap-2 text-xs text-white/50">
-          <Shield size={14} />
-          Secure Account
+      {/* PROFILE CARD */}
+      <div className="p-5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-4">
+
+        <div className="w-14 h-14 rounded-full bg-teal-400/20 flex items-center justify-center text-teal-400 font-bold text-xl">
+          {name[0]}
         </div>
+
+        <div>
+          <p className="font-semibold">{name}</p>
+          <p className="text-sm text-white/60">{email}</p>
+        </div>
+
       </div>
 
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+      {/* WORK INFO */}
+      <div>
+        <p className="text-xs text-white/50 mb-3">
+          WORK INFORMATION
+        </p>
 
-        {/* LEFT PROFILE */}
-        <div className="bg-[#14283C] rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center shadow-md">
+        <Tile
+          title="Department"
+          value={department}
+          onClick={() =>
+            editField("Department", "department", department)
+          }
+        />
 
-          {/* AVATAR */}
-          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-xl sm:text-2xl font-bold">
-            ST
-          </div>
+        <Tile
+          title="Designation"
+          value={designation}
+          onClick={() =>
+            editField("Designation", "designation", designation)
+          }
+        />
 
-          {/* INFO */}
-          <h2 className="mt-4 sm:mt-5 text-lg sm:text-xl font-semibold">
-            Anjali Deshmukh
-          </h2>
+        <Tile
+          title="Contact"
+          value={contact}
+          onClick={() =>
+            editField("Contact", "contactNumber", contact)
+          }
+        />
+      </div>
 
-          <span className="mt-2 px-3 py-1 text-[10px] sm:text-xs rounded-full bg-blue-500/20 text-blue-400">
-            Staff Member
-          </span>
-
-          <p className="mt-2 text-xs sm:text-sm text-white/60">
-            Employee ID: ST-2045
-          </p>
-
-        </div>
-
-        {/* RIGHT CONTENT */}
-        <div className="xl:col-span-2 space-y-5 sm:space-y-6">
-
-          {/* WORK INFO */}
-          <div>
-            <SectionTitle title="Work Information" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4">
-
-              <InfoCard
-                label="Department"
-                value="Front Desk Administration"
-                icon={Building2}
-              />
-
-              <InfoCard
-                label="Hospital"
-                value="City Care Hospital"
-                icon={User}
-              />
-
-              <InfoCard
-                label="Shift Timing"
-                value="9:00 AM - 6:00 PM"
-                icon={Clock}
-              />
-
-              <InfoCard
-                label="Email"
-                value="staff@mediconnect.com"
-                icon={Mail}
-              />
-
-            </div>
-          </div>
-
-          {/* ACCOUNT */}
-          <div>
-            <SectionTitle title="Account" />
-
-            <div className="space-y-2 sm:space-y-3 mt-3 sm:mt-4">
-
-              <ActionCard label="Change Password" />
-
-              <ActionCard
-                label="Logout"
-                danger
-                onClick={handleLogout}
-              />
-
-            </div>
-          </div>
-
-        </div>
-
+      {/* LOGOUT */}
+      <div className="pt-10">
+        <button
+          onClick={logout}
+          className="w-full py-3 rounded-xl border border-red-400 text-red-400 hover:bg-red-400/10"
+        >
+          Logout
+        </button>
       </div>
 
     </div>
@@ -113,65 +121,28 @@ const StaffProfile = () => {
 
 export default StaffProfile;
 
-/* ===== SECTION TITLE ===== */
+/* ================= TILE ================= */
 
-const SectionTitle = ({ title }: { title: string }) => (
-  <p className="text-[10px] sm:text-xs tracking-widest text-white/50 uppercase">
-    {title}
-  </p>
-);
-
-/* ===== INFO CARD ===== */
-
-const InfoCard = ({
-  label,
+const Tile = ({
+  title,
   value,
-  icon: Icon,
+  onClick,
 }: {
-  label: string;
+  title: string;
   value: string;
-  icon: any;
+  onClick: () => void;
 }) => {
   return (
-    <div className="bg-[#14283C] p-4 sm:p-5 rounded-xl flex items-center gap-3 sm:gap-4 hover:bg-[#1b3550] transition">
-      <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
-        <Icon size={16} className="text-blue-400" />
-      </div>
+    <div
+      onClick={onClick}
+      className="p-4 mb-3 rounded-xl bg-white/5 border border-white/10 flex justify-between cursor-pointer hover:bg-white/10"
+    >
+      <span className="text-white/60">{title}</span>
 
-      <div className="min-w-0">
-        <p className="text-[10px] sm:text-xs text-white/50">
-          {label}
-        </p>
-        <p className="text-xs sm:text-sm font-medium mt-1 truncate">
-          {value}
-        </p>
+      <div className="flex items-center gap-2">
+        <span>{value}</span>
+        <span className="text-white/40 text-sm">✏️</span>
       </div>
     </div>
-  );
-};
-
-/* ===== ACTION CARD ===== */
-
-const ActionCard = ({
-  label,
-  onClick,
-  danger,
-}: {
-  label: string;
-  onClick?: () => void;
-  danger?: boolean;
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[#14283C] transition ${
-        danger
-          ? "text-red-400 hover:bg-red-500/10"
-          : "text-white/80 hover:bg-white/5"
-      }`}
-    >
-      <span className="text-xs sm:text-sm font-medium">{label}</span>
-      <span className="text-white/30">→</span>
-    </button>
   );
 };

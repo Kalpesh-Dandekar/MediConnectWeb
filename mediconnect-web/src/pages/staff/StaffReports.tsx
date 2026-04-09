@@ -1,99 +1,136 @@
 "use client";
 
-import { FileText, CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import {
+  listenToReports,
+  uploadReport,
+} from "../../services/staff/reportService";
+
+/* ================= TYPES ================= */
 
 type Report = {
-  patient: string;
-  reportType: string;
-  collectedDate: string;
-  status: "Pending" | "Uploaded";
+  id: string;
+  patientId: string;
+  testName: string;
+  givenOn: string;
+  status: string;
 };
 
-const StaffReports = () => {
-  const reports: Report[] = [
-    {
-      patient: "Rahul Sharma",
-      reportType: "Complete Blood Count (CBC)",
-      collectedDate: "22 Mar 2025",
-      status: "Pending",
-    },
-    {
-      patient: "Amit Verma",
-      reportType: "Liver Function Test",
-      collectedDate: "23 Mar 2025",
-      status: "Pending",
-    },
-    {
-      patient: "Priya Mehta",
-      reportType: "Vitamin D Test",
-      collectedDate: "18 Mar 2025",
-      status: "Uploaded",
-    },
-  ];
+/* ================= COMPONENT ================= */
 
-  const pending = reports.filter((r) => r.status === "Pending");
-  const uploaded = reports.filter((r) => r.status === "Uploaded");
+const StaffReports = () => {
+  const location = useLocation();
+
+  const [list, setList] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  /* FORM */
+  const [patientId, setPatientId] = useState(
+    location.state?.patientId || ""
+  );
+  const [testName, setTestName] = useState("");
+  const [labName, setLabName] = useState("");
+  const [summary, setSummary] = useState("");
+
+  /* INIT */
+  useEffect(() => {
+    const unsub = listenToReports((data: Report[]) => {
+      setList(data);
+      setLoading(false);
+    });
+
+    return () => unsub && unsub();
+  }, []);
+
+  /* UPLOAD */
+  const handleUpload = async () => {
+    if (!patientId || !testName || !summary) {
+      return alert("Fill all required fields");
+    }
+
+    await uploadReport({
+      patientId,
+      testName,
+      labName,
+      resultSummary: summary,
+    });
+
+    alert("Report Uploaded ✅");
+
+    setTestName("");
+    setLabName("");
+    setSummary("");
+  };
+
+  const pending = list.filter((r) => r.status !== "completed");
+  const uploaded = list.filter((r) => r.status === "completed");
+
+  if (loading) return <p className="text-white p-10">Loading...</p>;
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto space-y-6 sm:space-y-8">
+    <div className="max-w-screen-xl mx-auto space-y-6">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">
-            Report Management
-          </h1>
-          <p className="text-white/60 text-xs sm:text-sm mt-1">
-            Manage lab report processing
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold">Report Management</h1>
+        <p className="text-white/60 text-sm">
+          Upload and manage reports
+        </p>
+      </div>
 
-        <div className="hidden md:flex items-center gap-2 text-xs text-white/50">
-          <FileText size={14} />
-          Lab System
-        </div>
+      {/* 🔥 UPLOAD FORM */}
+      <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-3">
+
+        <input
+          placeholder="Patient ID"
+          value={patientId}
+          onChange={(e) => setPatientId(e.target.value)}
+          className="w-full p-3 bg-black/20 rounded text-white"
+        />
+
+        <input
+          placeholder="Test Name"
+          value={testName}
+          onChange={(e) => setTestName(e.target.value)}
+          className="w-full p-3 bg-black/20 rounded text-white"
+        />
+
+        <input
+          placeholder="Lab Name"
+          value={labName}
+          onChange={(e) => setLabName(e.target.value)}
+          className="w-full p-3 bg-black/20 rounded text-white"
+        />
+
+        <textarea
+          placeholder="Result Summary"
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
+          className="w-full p-3 bg-black/20 rounded text-white"
+        />
+
+        <button
+          onClick={handleUpload}
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF9F1C] to-[#FFB703] text-black font-semibold"
+        >
+          Upload Report
+        </button>
+
       </div>
 
       {/* SUMMARY */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <SummaryCard
-          label="Pending"
-          count={pending.length}
-          icon={FileText}
-          color="orange"
-        />
-        <SummaryCard
-          label="Uploaded"
-          count={uploaded.length}
-          icon={CheckCircle}
-          color="green"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <Summary label="Pending" value={pending.length} />
+        <Summary label="Uploaded" value={uploaded.length} />
       </div>
 
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+      {/* LIST */}
+      <div className="space-y-3">
 
-        {/* PENDING */}
-        <div>
-          <SectionTitle title="Pending Reports" />
-
-          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
-            {pending.map((r, i) => (
-              <ReportCard key={i} {...r} />
-            ))}
-          </div>
-        </div>
-
-        {/* UPLOADED */}
-        <div>
-          <SectionTitle title="Uploaded Reports" />
-
-          <div className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
-            {uploaded.map((r, i) => (
-              <ReportCard key={i} {...r} />
-            ))}
-          </div>
-        </div>
+        {list.map((r) => (
+          <Card key={r.id} {...r} />
+        ))}
 
       </div>
 
@@ -103,111 +140,34 @@ const StaffReports = () => {
 
 export default StaffReports;
 
-/* ===== SECTION TITLE ===== */
+/* ================= CARD ================= */
 
-const SectionTitle = ({ title }: { title: string }) => (
-  <p className="text-[10px] sm:text-xs tracking-widest text-white/50 uppercase">
-    {title}
-  </p>
+const Card = ({ testName, givenOn, status }: any) => {
+  const done = status === "completed";
+
+  return (
+    <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+
+      <div className="flex justify-between">
+        <p className="text-white">{testName}</p>
+        <span className={done ? "text-green-400" : "text-orange-400"}>
+          {done ? "Uploaded" : "Pending"}
+        </span>
+      </div>
+
+      <p className="text-xs text-white/50 mt-1">
+        {givenOn || "--"}
+      </p>
+
+    </div>
+  );
+};
+
+/* ================= SUMMARY ================= */
+
+const Summary = ({ label, value }: any) => (
+  <div className="p-4 bg-white/5 rounded-xl text-center">
+    <p className="text-xl text-white font-semibold">{value}</p>
+    <p className="text-xs text-white/50">{label}</p>
+  </div>
 );
-
-/* ===== SUMMARY CARD ===== */
-
-const SummaryCard = ({
-  label,
-  count,
-  icon: Icon,
-  color,
-}: {
-  label: string;
-  count: number;
-  icon: any;
-  color: "orange" | "green";
-}) => {
-  const styles: any = {
-    orange: "text-orange-400",
-    green: "text-green-400",
-  };
-
-  return (
-    <div className="p-4 sm:p-6 bg-[#14283C] rounded-xl flex items-center justify-between">
-      <div>
-        <p className="text-xs sm:text-sm text-white/70">{label}</p>
-        <h2 className={`text-xl sm:text-3xl font-bold mt-1 ${styles[color]}`}>
-          {count}
-        </h2>
-      </div>
-
-      <div className="p-2 sm:p-3 bg-white/5 rounded-lg">
-        <Icon size={16} className={styles[color]} />
-      </div>
-    </div>
-  );
-};
-
-/* ===== REPORT CARD ===== */
-
-const ReportCard = ({
-  patient,
-  reportType,
-  collectedDate,
-  status,
-}: Report) => {
-  const isPending = status === "Pending";
-
-  const statusColor = isPending
-    ? "text-orange-400 bg-orange-500/10"
-    : "text-green-400 bg-green-500/10";
-
-  return (
-    <div className="flex rounded-xl bg-[#14283C] overflow-hidden hover:bg-[#1b3550] transition">
-
-      {/* LEFT STRIP */}
-      <div
-        className={`w-1 ${
-          isPending ? "bg-orange-400" : "bg-green-400"
-        }`}
-      />
-
-      {/* CONTENT */}
-      <div className="p-4 sm:p-5 flex-1">
-
-        {/* HEADER */}
-        <div className="flex justify-between items-center gap-2">
-          <h3 className="font-semibold text-sm sm:text-base truncate">
-            {patient}
-          </h3>
-
-          <span
-            className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium ${statusColor}`}
-          >
-            {status}
-          </span>
-        </div>
-
-        {/* DETAILS */}
-        <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-white/70">
-          {reportType}
-        </div>
-
-        <div className="text-[10px] sm:text-xs text-white/50 mt-1">
-          Collected: {collectedDate}
-        </div>
-
-        {/* ACTION */}
-        <div className="flex justify-end mt-3 sm:mt-4">
-          <button
-            className={`px-3 sm:px-4 py-1 text-xs sm:text-sm rounded-lg font-medium transition ${
-              isPending
-                ? "bg-orange-500/20 text-orange-400 hover:bg-orange-500/30"
-                : "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-            }`}
-          >
-            {isPending ? "Upload Result" : "View Details"}
-          </button>
-        </div>
-
-      </div>
-    </div>
-  );
-};
