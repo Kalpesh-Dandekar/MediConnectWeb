@@ -36,8 +36,8 @@ import StaffLayout from "./layout/StaffLayout";
 import StaffDashboard from "./pages/staff/StaffDashboard";
 import StaffAppointments from "./pages/staff/StaffAppointments";
 import StaffProfile from "./pages/staff/StaffProfile";
-import StaffEmergency from "./pages/staff/StaffEmergency"; // 🔥 ADD THIS
-
+import StaffEmergency from "./pages/staff/StaffEmergency";
+import StaffReports from "./pages/staff/StaffReports";
 /* ================= RELATIVE ================= */
 import RelativeLayout from "./layout/RelativeLayout";
 import RelativeDashboard from "./pages/relative/RelativeDashboard";
@@ -85,15 +85,16 @@ function App() {
         <Route path="emergency" element={<Emergencies />} />
       </Route>
 
-      {/* ================= STAFF (FIXED ✅) */}
+      {/* ================= STAFF ================= */}
       <Route path="/staff" element={<StaffLayout />}>
         <Route index element={<Navigate to="dashboard" />} />
         <Route path="dashboard" element={<StaffDashboard />} />
         <Route path="appointments" element={<StaffAppointments />} />
-        <Route path="emergency" element={<StaffEmergency />} /> {/* 🔥 ADDED */}
+        <Route path="emergency" element={<StaffEmergency />} />
         <Route path="profile" element={<StaffProfile />} />
 
-        {/* ❌ REMOVED: reports, patients */}
+        {/* ✅ ADDED FIX (DO NOT REMOVE ANYTHING ELSE) */}
+        <Route path="reports" element={<StaffReports />} />
       </Route>
 
       {/* ================= RELATIVE ================= */}

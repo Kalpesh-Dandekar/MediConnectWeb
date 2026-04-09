@@ -16,7 +16,10 @@ export const listenToPatientReports = (callback: any) => {
   let unsubscribeFirestore: any;
 
   const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-    if (!user) return;
+    if (!user) {
+      callback({ docs: [] }); // prevent UI crash
+      return;
+    }
 
     const q = query(
       collection(db, "reports"),
@@ -24,7 +27,30 @@ export const listenToPatientReports = (callback: any) => {
       orderBy("createdAt", "desc")
     );
 
-    unsubscribeFirestore = onSnapshot(q, callback);
+    unsubscribeFirestore = onSnapshot(
+      q,
+      (snapshot) => {
+        // ✅ normalize data before sending
+        const normalizedDocs = snapshot.docs.map((doc) => {
+          const data = doc.data();
+
+          let status = data.status;
+          if (status === "completed") status = "available";
+
+          return {
+            id: doc.id,
+            ...data,
+            status,
+          };
+        });
+
+        callback({ docs: normalizedDocs });
+      },
+      (error) => {
+        console.error("🔥 Firestore error:", error);
+        callback({ docs: [] });
+      }
+    );
   });
 
   return () => {
@@ -50,11 +76,20 @@ export const getLatestReport = async () => {
   const snapshot = await getDocs(q);
   if (snapshot.empty) return null;
 
-  return snapshot.docs[0].data();
+  const data = snapshot.docs[0].data();
+
+  // ✅ normalize status
+  let status = data.status;
+  if (status === "completed") status = "available";
+
+  return {
+    ...data,
+    status,
+  };
 };
 
 /* ================================
-   🔥 SUMMARY
+   🔥 SUMMARY (FIXED)
 ================================ */
 export const getReportSummary = async () => {
   const user = auth.currentUser;
@@ -66,7 +101,18 @@ export const getReportSummary = async () => {
   );
 
   const snapshot = await getDocs(q);
-  const docs = snapshot.docs.map((d) => d.data());
+
+  const docs = snapshot.docs.map((d) => {
+    const data = d.data();
+
+    let status = data.status;
+    if (status === "completed") status = "available";
+
+    return {
+      ...data,
+      status,
+    };
+  });
 
   return {
     total: docs.length,

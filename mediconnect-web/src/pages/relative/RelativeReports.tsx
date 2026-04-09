@@ -41,10 +41,12 @@ const RelativeReports = () => {
 
     setPatient(p);
 
-    listenToPatientReports(p.id, (list: any[]) => {
+    const unsub = listenToPatientReports(p.id, (list: any[]) => {
       setReports(list);
       setLoading(false);
     });
+
+    return () => unsub && unsub();
   };
 
   /* FILTER */
@@ -67,25 +69,27 @@ const RelativeReports = () => {
 
       {/* SUMMARY */}
       <div className="grid grid-cols-3 gap-4">
-
         <Summary label="Total" value={reports.length} />
         <Summary label="Pending" value={pending.length} />
         <Summary label="Available" value={available.length} />
-
       </div>
 
       {/* PENDING */}
       <Section title="Pending Reports">
-        {pending.map((r) => (
-          <PendingCard key={r.id} {...r} />
-        ))}
+        {pending.length === 0
+          ? <Empty text="No pending reports" />
+          : pending.map((r) => (
+              <PendingCard key={r.id} {...r} />
+            ))}
       </Section>
 
       {/* AVAILABLE */}
       <Section title="Available Reports">
-        {available.map((r) => (
-          <AvailableCard key={r.id} {...r} />
-        ))}
+        {available.length === 0
+          ? <Empty text="No reports available" />
+          : available.map((r) => (
+              <AvailableCard key={r.id} {...r} />
+            ))}
       </Section>
 
     </div>
@@ -108,6 +112,10 @@ const Section = ({ title, children }: any) => (
     <p className="text-xs text-white/50 uppercase mb-3">{title}</p>
     <div className="space-y-3">{children}</div>
   </div>
+);
+
+const Empty = ({ text }: any) => (
+  <p className="text-white/40 text-sm">{text}</p>
 );
 
 /* ================= PENDING CARD ================= */
@@ -146,6 +154,7 @@ const AvailableCard = ({
   uploadedOn,
   doctorName,
   resultStatus,
+  labName,
 }: Report) => {
   const color =
     resultStatus === "Normal"
@@ -170,6 +179,10 @@ const AvailableCard = ({
 
       <p className={`text-xs mt-2 font-semibold ${color}`}>
         Result: {resultStatus || "--"}
+      </p>
+
+      <p className="text-xs text-white/40 mt-1">
+        Lab: {labName || "--"}
       </p>
 
       <button className="mt-3 w-full py-2 rounded bg-orange-400 text-black text-sm">

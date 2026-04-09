@@ -2,7 +2,6 @@ import { db } from "../firebase";
 import {
   collection,
   addDoc,
-  serverTimestamp,
   onSnapshot,
   query,
   orderBy,
@@ -16,14 +15,30 @@ export const listenToReports = (callback: any) => {
     orderBy("createdAt", "desc")
   );
 
-  return onSnapshot(q, (snap) => {
-    const data = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    }));
+  return onSnapshot(
+    q,
+    (snap) => {
+      console.log("🔥 SNAPSHOT CALLED:", snap.size);
 
-    callback(data);
-  });
+      const data = snap.docs.map((d) => {
+        const docData: any = d.data();
+
+        return {
+          id: d.id,
+          patientId: docData.patientId || "",
+          testName: docData.testName || "",
+          givenOn: docData.givenOn || "",
+          status: docData.status || "pending",
+        };
+      });
+
+      callback(data);
+    },
+    (error) => {
+      console.error("🔥 Firestore listener error:", error);
+      callback([]); // prevents UI freeze
+    }
+  );
 };
 
 /* ================= UPLOAD ================= */
@@ -49,6 +64,8 @@ export const uploadReport = async ({
     resultStatus: "Normal",
     resultSummary,
     status: "completed",
-    createdAt: serverTimestamp(),
+
+    // ✅ keep this (works immediately, no delay issue)
+    createdAt: new Date(),
   });
 };

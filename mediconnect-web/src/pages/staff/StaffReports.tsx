@@ -20,6 +20,8 @@ type Report = {
 /* ================= COMPONENT ================= */
 
 const StaffReports = () => {
+  console.log("✅ StaffReports Mounted"); // DEBUG
+
   const location = useLocation();
 
   const [list, setList] = useState<Report[]>([]);
@@ -27,7 +29,7 @@ const StaffReports = () => {
 
   /* FORM */
   const [patientId, setPatientId] = useState(
-    location.state?.patientId || ""
+    (location.state as any)?.patientId || ""
   );
   const [testName, setTestName] = useState("");
   const [labName, setLabName] = useState("");
@@ -35,12 +37,24 @@ const StaffReports = () => {
 
   /* INIT */
   useEffect(() => {
+    console.log("🔥 useEffect running");
+
     const unsub = listenToReports((data: Report[]) => {
+      console.log("🔥 DATA RECEIVED:", data);
       setList(data);
       setLoading(false);
     });
 
-    return () => unsub && unsub();
+    // fallback safety (no UI change)
+    const timer = setTimeout(() => {
+      console.log("⚠ fallback triggered");
+      setLoading(false);
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      unsub && unsub();
+    };
   }, []);
 
   /* UPLOAD */

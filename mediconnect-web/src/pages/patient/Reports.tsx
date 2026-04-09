@@ -11,10 +11,8 @@ const Reports = () => {
 
   useEffect(() => {
     const unsubscribe = ReportService.listenToPatientReports((snapshot: any) => {
-      const data = snapshot.docs.map((doc: any) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      // ✅ NOW docs are already formatted
+      const data = snapshot.docs;
 
       setReports(data);
       setLoading(false);
@@ -23,8 +21,13 @@ const Reports = () => {
     return () => unsubscribe && unsubscribe();
   }, []);
 
+  /* ================= FILTER ================= */
+
   const pending = reports.filter((r) => r.status === "pending");
-  const available = reports.filter((r) => r.status === "available");
+
+  const available = reports.filter(
+    (r) => r.status === "available"
+  );
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
@@ -48,12 +51,14 @@ const Reports = () => {
         <p className="text-gray-400 text-sm">Loading reports...</p>
       ) : (
         <>
+          {/* ================= PENDING ================= */}
           <Section title="PENDING REPORTS">
             {pending.length === 0
               ? <Empty text="No pending reports" />
               : pending.map((r) => <Pending key={r.id} {...r} />)}
           </Section>
 
+          {/* ================= AVAILABLE ================= */}
           <Section title="AVAILABLE REPORTS">
             {available.length === 0
               ? <Empty text="No reports available" />
@@ -88,20 +93,26 @@ const Empty = ({ text }: any) => (
   <p className="text-gray-500 text-sm">{text}</p>
 );
 
-const Pending = ({ testName, givenOn, expectedOn, labName }: any) => (
+const Pending = ({ testName, givenOn, labName }: any) => (
   <div className="p-5 rounded-xl bg-white/5 border border-white/10">
     <p className="font-semibold">{testName}</p>
     <p className="text-sm text-gray-400">Given: {givenOn}</p>
-    <p className="text-sm text-gray-400">Expected: {expectedOn}</p>
     <p className="text-xs text-gray-500 mt-1">Lab: {labName}</p>
   </div>
 );
 
-const Available = ({ testName, uploadedOn, doctorName, resultStatus }: any) => (
+const Available = ({
+  testName,
+  uploadedOn,
+  doctorName,
+  resultStatus,
+  labName,
+}: any) => (
   <div className="p-5 rounded-xl bg-white/5 border border-white/10">
     <p className="font-semibold">{testName}</p>
     <p className="text-sm text-gray-400">Uploaded: {uploadedOn}</p>
     <p className="text-sm text-gray-400">Doctor: {doctorName}</p>
-    <p className="text-sm mt-1">{resultStatus}</p>
+    <p className="text-sm">{resultStatus}</p>
+    <p className="text-xs text-gray-500 mt-1">Lab: {labName}</p>
   </div>
 );
