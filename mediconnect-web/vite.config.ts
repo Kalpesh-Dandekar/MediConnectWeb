@@ -4,7 +4,12 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/MediConnectWeb/", // 🔥 REQUIRED for GitHub Pages
+  // ✅ Auto handle GitHub Pages vs Vercel
+  base:
+    process.env.NODE_ENV === "production" &&
+    process.env.VERCEL !== "1"
+      ? "/MediConnectWeb/" // GitHub Pages
+      : "/", // Vercel / local
 
   plugins: [react()],
 
@@ -15,6 +20,6 @@ export default defineConfig({
   },
 
   build: {
-    chunkSizeWarningLimit: 1000, // 🔥 removes warning (optional but clean)
+    chunkSizeWarningLimit: 1000,
   },
 });
